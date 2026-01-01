@@ -54,6 +54,16 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/error").permitAll()
                 
+                // Static resources & Login page
+                .requestMatchers("/", "/login", "/login.html").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/static/**").permitAll()
+                
+                // Dashboard pages - allow access (authorization handled by frontend)
+                .requestMatchers("/admin/dashboard", "/admin/**").permitAll()
+                .requestMatchers("/support/dashboard", "/support/**").permitAll()
+                .requestMatchers("/employee/dashboard", "/employee/**").permitAll()
+                .requestMatchers("/dashboard").permitAll()
+                
                 // User Management - requires specific permissions
                 .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority("USER_VIEW")
                 .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
