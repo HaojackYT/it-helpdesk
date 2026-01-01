@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Helpdesk System - Đăng nhập hệ thống hỗ trợ">
+    <title>Helpdesk System - Đăng nhập</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <main class="container">
+        <div class="login-card">
+            <h1 class="title">Helpdesk System</h1>
+            
+            <!-- Alert Message Container -->
+            <div id="alertContainer" class="alert-container" role="alert" aria-live="polite"></div>
+            
+            <form class="login-form" id="loginForm" novalidate>
+                <div class="form-group">
+                    <label for="username" class="sr-only">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username"
+                        class="form-input" 
+                        placeholder="Username"
+                        required
+                        autocomplete="username"
+                        aria-required="true"
+                    >
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="sr-only">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        class="form-input" 
+                        placeholder="Password"
+                        required
+                        autocomplete="current-password"
+                        aria-required="true"
+                    >
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+                
+                <button type="submit" class="btn-signin" id="submitBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" aria-hidden="true"></span>
+                </button>
+            </form>
+            
+            <div class="footer-links">
+                <a href="#" class="link-forgot">Forgot password</a>
+                <a href="#" class="link-signup">Sign Up</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * Login Module
+         * Handles user authentication via REST API
+         */
+        (function() {
+            'use strict';
+
+            // ==========================================
+            // Configuration
+            // ==========================================
+            const CONFIG = {
+                API_BASE_URL: '/api/auth',
+                ENDPOINTS: {
+                    LOGIN: '/login'
+                },
+                STORAGE_KEYS: {
+                    TOKEN: 'auth_token',
+                    TOKEN_TYPE: 'token_type',
+                    USER: 'user_info'
+                },
+                REDIRECT_URLS: {
+                    ADMIN: '/admin/dashboard',
+                    IT_SUPPORT: '/support/dashboard',
+                    EMPLOYEE: '/employee/dashboard',
+                    DEFAULT: '/dashboard'
+                },
+                DEBOUNCE_DELAY: 300
+            };
+
+            // ==========================================
+            // DOM Elements
+            // ==========================================
+            const elements = {
+                form: document.getElementById('loginForm'),
+                username: document.getElementById('username'),
+                password: document.getElementById('password'),
+                submitBtn: document.getElementById('submitBtn'),
+                alertContainer: document.getElementById('alertContainer'),
+                usernameError: document.getElementById('usernameError'),
+                passwordError: document.getElementById('passwordError')
+            };
+
+            // ==========================================
+            // Utility Functions
+            // ==========================================
+            
+            /**
+             * Debounce function to limit API calls
+             */
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            /**
+             * Sanitize input to prevent XSS
+             */
+            function sanitizeInput(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            }
+
+            /**
+             * Show alert message
+             */
+            function showAlert(message, type = 'error') {
+                const alertContainer = elements.alertContainer;
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type}" role="alert">
+                        <span class="alert-icon">${type === 'success' ? '✓' : '⚠'}</span>
+                        <span class="alert-message">${sanitizeInput(message)}</span>
+                        <button type="button" class="alert-close" onclick="this.parentElement.remove()" aria-label="Close">×</button>
+                    </div>
+                `;
+                alertContainer.classList.add('show');
+
+                // Auto hide after 5 seconds for success messages
+                if (type === 'success') {
+                    setTimeout(() => {
+                        alertContainer.classList.remove('show');
+                        alertContainer.innerHTML = '';
+                    }, 5000);
+                }
+            }
+
+            /**
+             * Hide alert message
+             */
+            function hideAlert() {
+                elements.alertContainer.classList.remove('show');
+                elements.alertContainer.innerHTML = '';
+            }
+
+            /**
+             * Show field error
+             */
+            function showFieldError(field, errorElement, message) {
+                field.classList.add('input-error');
+                field.setAttribute('aria-invalid', 'true');
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+
+            /**
+             * Clear field error
+             */
+            function clearFieldError(field, errorElement) {
+                field.classList.remove('input-error');
+                field.removeAttribute('aria-invalid');
+                errorElement.textContent = '';
+                errorElement.classList.remove('show');
+            }
+
+            /**
+             * Clear all errors
+             */
+            function clearAllErrors() {
+                clearFieldError(elements.username, elements.usernameError);
+                clearFieldError(elements.password, elements.passwordError);
+                hideAlert();
+            }
+
+            /**
+             * Set loading state
+             */
+            function setLoading(isLoading) {
+                elements.submitBtn.disabled = isLoading;
+                elements.submitBtn.classList.toggle('loading', isLoading);
+                elements.username.disabled = isLoading;
+                elements.password.disabled = isLoading;
+            }
+
+            // ==========================================
+            // Validation
+            // ==========================================
+            
+            /**
+             * Validate form inputs
+             */
+            function validateForm() {
+                let isValid = true;
+                clearAllErrors();
+
+                // Validate username
+                const username = elements.username.value.trim();
+                if (!username) {
+                    showFieldError(elements.username, elements.usernameError, 'Username is required');
+                    isValid = false;
+                } else if (username.length < 3) {
+                    showFieldError(elements.username, elements.usernameError, 'Username must be at least 3 characters');
+                    isValid = false;
+                }
+
+                // Validate password
+                const password = elements.password.value;
+                if (!password) {
+                    showFieldError(elements.password, elements.passwordError, 'Password is required');
+                    isValid = false;
+                } else if (password.length < 4) {
+                    showFieldError(elements.password, elements.passwordError, 'Password must be at least 4 characters');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            // ==========================================
+            // API Functions
+            // ==========================================
+            
+            /**
+             * Login API call
+             */
+            async function loginAPI(credentials) {
+                const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.LOGIN}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Handle different error status codes
+                    if (response.status === 401) {
+                        throw new Error(data.message || 'Invalid username or password');
+                    } else if (response.status === 400) {
+                        // Validation errors from server
+                        if (data.errors) {
+                            const errorMessages = Object.values(data.errors).join(', ');
+                            throw new Error(errorMessages);
+                        }
+                        throw new Error(data.message || 'Invalid request');
+                    } else if (response.status === 429) {
+                        throw new Error('Too many login attempts. Please try again later.');
+                    } else if (response.status >= 500) {
+                        throw new Error('Server error. Please try again later.');
+                    }
+                    throw new Error(data.message || 'Login failed. Please try again.');
+                }
+
+                return data;
+            }
+
+            // ==========================================
+            // Storage Functions
+            // ==========================================
+            
+            /**
+             * Save authentication data to localStorage
+             */
+            function saveAuthData(loginResponse) {
+                const { token, type, username, fullName, email, roles, permissions } = loginResponse;
+                
+                // Save token
+                localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
+                localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE, type || 'Bearer');
+                
+                // Save user info
+                const userInfo = {
+                    username,
+                    fullName,
+                    email,
+                    roles: Array.from(roles || []),
+                    permissions: Array.from(permissions || [])
+                };
+                localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(userInfo));
+            }
+
+            /**
+             * Clear authentication data
+             */
+            function clearAuthData() {
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE);
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
+            }
+
+            /**
+             * Get redirect URL based on user roles
+             */
+            function getRedirectUrl(roles) {
+                const rolesArray = Array.isArray(roles) ? roles : Array.from(roles || []);
+                
+                if (rolesArray.includes('ROLE_ADMIN')) {
+                    return CONFIG.REDIRECT_URLS.ADMIN;
+                } else if (rolesArray.includes('ROLE_IT_SUPPORT')) {
+                    return CONFIG.REDIRECT_URLS.IT_SUPPORT;
+                } else if (rolesArray.includes('ROLE_EMPLOYEE')) {
+                    return CONFIG.REDIRECT_URLS.EMPLOYEE;
+                }
+                return CONFIG.REDIRECT_URLS.DEFAULT;
+            }
+
+            /**
+             * Check if user is already logged in with valid token
+             */
+            function isAuthenticated() {
+                const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+                if (!token) {
+                    return false;
+                }
+                
+                // Check if token is expired (JWT tokens have 3 parts separated by dots)
+                try {
+                    const parts = token.split('.');
+                    if (parts.length !== 3) {
+                        clearAuthData();
+                        return false;
+                    }
+                    
+                    // Decode payload (second part of JWT)
+                    const payload = JSON.parse(atob(parts[1]));
+                    const expiration = payload.exp * 1000; // Convert to milliseconds
+                    
+                    if (Date.now() >= expiration) {
+                        // Token expired, clear auth data
+                        console.log('Token expired, clearing auth data');
+                        clearAuthData();
+                        return false;
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error parsing token:', error);
+                    clearAuthData();
+                    return false;
+                }
+            }
+            
+            /**
+             * Force logout - clear all auth data
+             * Can be called from browser console: window.forceLogout()
+             */
+            window.forceLogout = function() {
+                clearAuthData();
+                console.log('Logged out successfully. Refreshing page...');
+                window.location.reload();
+            };
+
+            // ==========================================
+            // Event Handlers
+            // ==========================================
+            
+            /**
+             * Handle form submission
+             */
+            async function handleSubmit(event) {
+                event.preventDefault();
+
+                // Validate form
+                if (!validateForm()) {
+                    return;
+                }
+
+                // Get form data
+                const credentials = {
+                    username: elements.username.value.trim(),
+                    password: elements.password.value
+                };
+
+                try {
+                    setLoading(true);
+                    hideAlert();
+
+                    // Call login API
+                    const response = await loginAPI(credentials);
+
+                    if (response.success && response.data) {
+                        // Save auth data
+                        saveAuthData(response.data);
+                        
+                        // Show success message
+                        showAlert(`Welcome back, ${response.data.fullName || response.data.username}!`, 'success');
+                        
+                        // Get redirect URL based on user roles
+                        const redirectUrl = getRedirectUrl(response.data.roles);
+                        
+                        // Redirect to appropriate dashboard after short delay
+                        setTimeout(() => {
+                            window.location.href = redirectUrl;
+                        }, 1000);
+                    } else {
+                        throw new Error(response.message || 'Login failed');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showAlert(error.message || 'An unexpected error occurred. Please try again.');
+                    
+                    // Clear password field on error
+                    elements.password.value = '';
+                    elements.password.focus();
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            /**
+             * Handle input change - clear error on typing
+             */
+            function handleInputChange(field, errorElement) {
+                return debounce(() => {
+                    if (field.value.trim()) {
+                        clearFieldError(field, errorElement);
+                    }
+                }, CONFIG.DEBOUNCE_DELAY);
+            }
+
+            // ==========================================
+            // Initialization
+            // ==========================================
+            
+            /**
+             * Initialize login module
+             */
+            function init() {
+                // Check if already authenticated
+                if (isAuthenticated()) {
+                    const userInfo = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER) || '{}');
+                    const redirectUrl = getRedirectUrl(userInfo.roles);
+                    window.location.href = redirectUrl;
+                    return;
+                }
+
+                // Form submit handler
+                elements.form.addEventListener('submit', handleSubmit);
+
+                // Input change handlers
+                elements.username.addEventListener('input', handleInputChange(elements.username, elements.usernameError));
+                elements.password.addEventListener('input', handleInputChange(elements.password, elements.passwordError));
+
+                // Clear errors on focus
+                elements.username.addEventListener('focus', () => clearFieldError(elements.username, elements.usernameError));
+                elements.password.addEventListener('focus', () => clearFieldError(elements.password, elements.passwordError));
+
+                // Enter key support
+                elements.password.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        elements.form.dispatchEvent(new Event('submit'));
+                    }
+                });
+
+                // Focus username field on load
+                elements.username.focus();
+            }
+
+            // Run initialization when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
