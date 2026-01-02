@@ -23,7 +23,7 @@ public class PageController {
     
     @GetMapping("/support/dashboard")
     public String supportDashboard() {
-        return "support/support-dashboard";
+        return "it-support/itsupport-dashboard";
     }
     
     @GetMapping("/employee/dashboard")
