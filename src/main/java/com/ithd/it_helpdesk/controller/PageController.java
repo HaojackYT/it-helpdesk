@@ -20,8 +20,8 @@ public class PageController {
     public String adminDashboard() {
         return "admin/admin-dashboard";
     }
-    
-    @GetMapping("/admin/tickets")
+
+       @GetMapping("/admin/tickets")
     public String adminTickets() {
         return "admin/admin-tickets";
     }
@@ -29,6 +29,11 @@ public class PageController {
     @GetMapping("/support/dashboard")
     public String supportDashboard() {
         return "it-support/itsupport-dashboard";
+    }
+
+     @GetMapping({"/support/tickets", "/support/my-tickets"})
+    public String supportTickets() {
+        return "it-support/itsupport-tickets";
     }
     
     @GetMapping("/employee/dashboard")
