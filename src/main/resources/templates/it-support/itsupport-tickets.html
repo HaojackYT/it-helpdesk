@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support - Tickets Management</title>
+    
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/it-support/itsupport-sidebar.css">
+    <link rel="stylesheet" href="/css/it-support/itsupport-tickets.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Component -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">IT Helpdesk</h1>
+            <div class="header-actions">
+                <button class="btn-icon btn-user" aria-label="User profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+                <button class="btn-icon btn-logout" aria-label="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Component -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="/support/dashboard" class="menu-link" title="Dashboard">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item active">
+                    <a href="/support/my-tickets" class="menu-link" title="Tickets">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span class="menu-text">My Tickets</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item">
+                    <a href="/support/performance" class="menu-link" title="Performance">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span class="menu-text">Performance</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tickets-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2 class="page-title">Tickets</h2>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="tickets-controls">
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" placeholder="Find ticket" id="searchInput">
+                    <button class="search-btn" aria-label="Search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="entries-control">
+                    <span class="entries-label">Show:</span>
+                    <select class="entries-select" id="entriesSelect">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="entries-label">Entries</span>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading tickets...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <p id="errorMessage">Failed to load tickets</p>
+                <button onclick="TicketsManager.fetchTickets()" class="retry-btn">Retry</button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <p>No tickets found</p>
+            </div>
+
+            <!-- Tickets Table -->
+            <div class="table-wrapper" id="tableWrapper" style="display: none;">
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th class="th-id">ID</th>
+                            <th class="th-title">Title</th>
+                            <th class="th-description">Description</th>
+                            <th class="th-category">Category</th>
+                            <th class="th-priority">Priority</th>
+                            <th class="th-created">Created At</th>
+                            <th class="th-status">Status</th>
+                            <th class="th-action">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <!-- Tickets will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-wrapper" id="paginationWrapper" style="display: none;">
+                <div class="pagination-info" id="paginationInfo">
+                    Showing 0 to 0 of 0 entries
+                </div>
+                <div class="pagination-controls" id="paginationControls">
+                    <!-- Pagination buttons will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ticket Details Modal -->
+    <div id="ticketDetailsModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h3 class="modal-title">Ticket Details</h3>
+            <button class="modal-close" aria-label="Close" onclick="TicketsManager.closeTicketModal()">×</button>
+            <div class="modal-body">
+                <div class="modal-left">
+                    <p><strong>Ticket No:</strong> <span id="detailTicketNo"></span></p>
+                    <p><strong>Date:</strong> <span id="detailDate"></span></p>
+                    <p><strong>Name:</strong> <span id="detailName"></span></p>
+                    <p><strong>Dept:</strong> <span id="detailDept"></span></p>
+                    <hr>
+                    <p><strong>Title:</strong> <span id="detailTitle"></span></p>
+                    <p><strong>Description:</strong></p>
+                    <p id="detailDescription" class="detail-description"></p>
+                    <p><strong>Category:</strong> <span id="detailCategory"></span></p>
+                    <p><strong>Priority:</strong> <span id="detailPriority"></span></p>
+                    <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+                    <p><strong>Created By:</strong></p>
+                    <div class="person-row">
+                        <div class="avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <div class="person-name" id="detailCreatedBy">User</div>
+                    </div>
+
+                    <p><strong>Assigned To:</strong></p>
+                    <div class="person-row">
+                        <div class="avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <div class="person-name" id="detailAssignedTo">ITSupport</div>
+                    </div>
+                </div>
+
+                <div class="modal-right close-panel">
+                    <h4>Close Ticket</h4>
+                    <div class="close-row">
+                        <label>Ticket No.</label>
+                        <input type="text" id="closeTicketNo" readonly>
+                    </div>
+                    <div class="close-row">
+                        <label>Team</label>
+                        <div class="team-controls">
+                            <select id="closeTeamSelect"></select>
+                            <button id="reloadTeamsBtn" class="icon-btn" title="Reload teams" aria-label="Reload teams">⟳</button>
+                        </div>
+                    </div>
+                    <div class="close-row">
+                        <label>Team Member</label>
+                        <select id="closeMemberSelect"></select>
+                    </div>
+                    <div class="close-row">
+                        <label>Comment</label>
+                        <textarea id="closeComment" placeholder="Add closing comment..."></textarea>
+                    </div>
+                    <div class="close-row actions">
+                        <button class="btn-close-ticket" onclick="TicketsManager.closeTicketWithForm()">Close Ticket</button>
+                    </div>
+                </div>
+
+            </div> 
+        </div>
+    </div>
+
+    <script>
+        // Reuse TicketsManager and AuthManager from admin page (identical logic)
+        const AuthManager = {
+            STORAGE_KEYS: {
+                TOKEN: 'auth_token',
+                TOKEN_TYPE: 'token_type',
+                USER: 'user_info'
+            },
+            getToken() { return localStorage.getItem(this.STORAGE_KEYS.TOKEN); },
+            getTokenType() { return localStorage.getItem(this.STORAGE_KEYS.TOKEN_TYPE) || 'Bearer'; },
+            getAuthHeader() { const token = this.getToken(); const tokenType = this.getTokenType(); return token ? `${tokenType} ${token}` : null; },
+            getUserInfo() { const userStr = localStorage.getItem(this.STORAGE_KEYS.USER); try { return userStr ? JSON.parse(userStr) : null; } catch { return null; } },
+            isAuthenticated() { const token = this.getToken(); if (!token) return false; try { const parts = token.split('.'); if (parts.length !== 3) { this.logout(); return false; } const payload = JSON.parse(atob(parts[1])); const expiration = payload.exp * 1000; if (Date.now() >= expiration) { this.logout(); return false; } return true; } catch { this.logout(); return false; } },
+            logout() { localStorage.removeItem(this.STORAGE_KEYS.TOKEN); localStorage.removeItem(this.STORAGE_KEYS.TOKEN_TYPE); localStorage.removeItem(this.STORAGE_KEYS.USER); window.location.href = '/login'; },
+            requireAuth() { if (!this.isAuthenticated()) { window.location.href = '/login'; return false;} return true; }
+        };
+
+        const TicketsManager = {
+            state: { tickets: [], filteredTickets: [], currentPage: 1, entriesPerPage: 10, searchTerm: '', isLoading: false, error: null },
+            API_BASE_URL: '/api/tickets',
+            async init() { if (!AuthManager.requireAuth()) return; this.bindEvents(); // prefetch users/teams (non-blocking)
+                    this.fetchUsersForTeams().catch(() => {});
+                    await this.fetchTickets(); },
+            bindEvents() {
+                const sidebar = document.querySelector('.sidebar');
+                const toggleBtn = document.querySelector('.sidebar-toggle');
+                const mainContent = document.querySelector('.main-content');
+                toggleBtn?.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); mainContent.classList.toggle('expanded'); });
+                const searchInput = document.getElementById('searchInput'); searchInput?.addEventListener('input', (e) => { this.state.searchTerm = e.target.value.toLowerCase(); this.state.currentPage = 1; this.filterAndRenderTickets(); });
+                const entriesSelect = document.getElementById('entriesSelect'); entriesSelect?.addEventListener('change', (e) => { this.state.entriesPerPage = parseInt(e.target.value); this.state.currentPage = 1; this.filterAndRenderTickets(); });
+                // team select change (close form)
+                document.getElementById('closeTeamSelect')?.addEventListener('change', () => this.onTeamChange());
+                const logoutBtn = document.querySelector('.btn-logout'); logoutBtn?.addEventListener('click', () => { AuthManager.logout(); });
+            },
+            async fetchTickets() {
+                this.showLoading();
+                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
+                try {
+                    const response = await fetch(this.API_BASE_URL, { method: 'GET', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader } });
+                    if (response.status === 401) { AuthManager.logout(); return; }
+                    if (response.status === 403) { throw new Error('You do not have permission to view tickets'); }
+                    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    if (result.success && Array.isArray(result.data)) { this.state.tickets = result.data; this.state.error = null; this.filterAndRenderTickets(); } else if (Array.isArray(result)) { this.state.tickets = result; this.state.error = null; this.filterAndRenderTickets(); } else { throw new Error('Invalid response format'); }
+                } catch (error) { console.error('Error fetching tickets:', error); this.state.error = error.message; this.showError(error.message); }
+            },
+            filterAndRenderTickets() { const { tickets, searchTerm } = this.state; this.state.filteredTickets = tickets.filter(ticket => { if (!searchTerm) return true; const searchableFields = [ ticket.id, ticket.title, ticket.description, ticket.category, ticket.priority, ticket.status, ticket.createdBy?.fullName, ticket.assignedTo?.fullName ].filter(Boolean).map(field => String(field).toLowerCase()); return searchableFields.some(field => field.includes(searchTerm)); }); this.renderTickets(); this.renderPagination(); },
+            renderTickets() { const { filteredTickets, currentPage, entriesPerPage } = this.state; const tableBody = document.getElementById('ticketsTableBody'); const tableWrapper = document.getElementById('tableWrapper'); const emptyState = document.getElementById('emptyState'); this.hideLoading(); this.hideError(); if (filteredTickets.length === 0) { tableWrapper.style.display = 'none'; emptyState.style.display = 'flex'; document.getElementById('paginationWrapper').style.display = 'none'; return; } emptyState.style.display = 'none'; tableWrapper.style.display = 'block'; document.getElementById('paginationWrapper').style.display = 'flex'; const startIndex = (currentPage - 1) * entriesPerPage; const endIndex = Math.min(startIndex + entriesPerPage, filteredTickets.length); const paginatedTickets = filteredTickets.slice(startIndex, endIndex); tableBody.innerHTML = paginatedTickets.map(ticket => this.createTicketRow(ticket)).join(''); this.addRowHoverEffects(); },
+            createTicketRow(ticket) { const shortId = ticket.id ? ticket.id.substring(0, 8) : 'N/A'; const title = this.truncateText(ticket.title || 'N/A', 20); const description = this.truncateText(ticket.description || 'N/A', 20); const category = ticket.category || 'N/A'; const priority = ticket.priority || 'N/A'; const status = (ticket.status || 'OPEN').toString().toUpperCase(); const createdAt = this.formatDateTime(ticket.createdAt); const statusClass = this.getStatusClass(status); const isClosable = !['RESOLVED', 'CLOSED'].includes(status); return `
+                    <tr class="ticket-row" data-id="${ticket.id}">
+                        <td class="td-id" title="${ticket.id}">${shortId}</td>
+                        <td class="td-title" title="${ticket.title || ''}">${title}</td>
+                        <td class="td-description" title="${ticket.description || ''}">${description}</td>
+                        <td class="td-category">${category}</td>
+                        <td class="td-priority priority-${String(priority).toLowerCase()}">${priority}</td>
+                        <td class="td-created">${createdAt}</td>
+                        <td class="td-status">
+                            <span class="status-badge ${statusClass}">${this.formatStatus(status)}</span>
+                        </td>
+                        <td class="td-action">
+                            <div class="action-buttons">
+                                <button class="action-btn" title="View Details" onclick="TicketsManager.viewTicket('${ticket.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                                <button class="action-btn" title="Assign User" onclick="TicketsManager.assignTicket('${ticket.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                                        <line x1="22" y1="11" x2="16" y2="11"></line>
+                                    </svg>
+                                </button>
+                                <button class="action-btn" title="More Info" onclick="TicketsManager.showMoreInfo('${ticket.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                </button>
+                                ${isClosable ? `
+                                    <button class="action-btn action-close" title="Close Ticket" onclick="TicketsManager.quickClose('${ticket.id}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 5v14"></path>
+                                            <path d="M5 12h14"></path>
+                                        </svg>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `; },
+            renderPagination() { const { filteredTickets, currentPage, entriesPerPage } = this.state; const totalPages = Math.ceil(filteredTickets.length / entriesPerPage); const startIndex = (currentPage - 1) * entriesPerPage + 1; const endIndex = Math.min(currentPage * entriesPerPage, filteredTickets.length); document.getElementById('paginationInfo').textContent = `Showing ${filteredTickets.length > 0 ? startIndex : 0} to ${endIndex} of ${filteredTickets.length} entries`; const paginationControls = document.getElementById('paginationControls'); let paginationHTML = ''; paginationHTML += `
+                    <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} 
+                            onclick="TicketsManager.goToPage(${currentPage - 1})" aria-label="Previous page">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="11 17 6 12 11 7"></polyline>
+                            <polyline points="18 17 13 12 18 7"></polyline>
+                        </svg>
+                    </button>
+                `; for (let i = Math.max(1, currentPage - 2); i <= Math.min(Math.ceil(filteredTickets.length / entriesPerPage), currentPage + 2); i++) { paginationHTML += `
+                        <button class="pagination-btn pagination-number ${i === currentPage ? 'active' : ''}" 
+                                onclick="TicketsManager.goToPage(${i})">${i}</button>
+                    `; } paginationHTML += `
+                    <button class="pagination-btn" ${currentPage === Math.ceil(filteredTickets.length / entriesPerPage) || Math.ceil(filteredTickets.length / entriesPerPage) === 0 ? 'disabled' : ''} 
+                            onclick="TicketsManager.goToPage(${currentPage + 1})" aria-label="Next page">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="13 17 18 12 13 7"></polyline>
+                            <polyline points="6 17 11 12 6 7"></polyline>
+                        </svg>
+                    </button>
+                `; paginationControls.innerHTML = paginationHTML; },
+            goToPage(page) { const totalPages = Math.ceil(this.state.filteredTickets.length / this.state.entriesPerPage); if (page >= 1 && page <= totalPages) { this.state.currentPage = page; this.renderTickets(); this.renderPagination(); document.getElementById('tableWrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } },
+            addRowHoverEffects() { const rows = document.querySelectorAll('.ticket-row'); rows.forEach(row => { row.addEventListener('mouseenter', function() { this.style.transform = 'translateX(4px)'; }); row.addEventListener('mouseleave', function() { this.style.transform = 'translateX(0)'; }); }); },
+            truncateText(text, maxLength) { if (!text) return 'N/A'; return text.length > maxLength ? text.substring(0, maxLength) + '...' : text; },
+            formatDateTime(dateTimeStr) { if (!dateTimeStr) return 'N/A'; try { const date = new Date(dateTimeStr); const hours = date.getHours().toString().padStart(2, '0'); const minutes = date.getMinutes().toString().padStart(2, '0'); const seconds = date.getSeconds().toString().padStart(2, '0'); const day = date.getDate().toString().padStart(2, '0'); const month = (date.getMonth() + 1).toString().padStart(2, '0'); const year = date.getFullYear(); return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`; } catch { return 'N/A'; } },
+            formatStatus(status) { if (!status) return 'OPEN'; return status.replace('_', ' '); },
+            getStatusClass(status) { const statusMap = { 'OPEN': 'status-open', 'ASSIGNED': 'status-assigned', 'IN_PROGRESS': 'status-progress', 'RESOLVED': 'status-resolved', 'CLOSED': 'status-closed' }; return statusMap[status] || 'status-open'; },
+            showLoading() { this.state.isLoading = true; document.getElementById('loadingState').style.display = 'flex'; document.getElementById('tableWrapper').style.display = 'none'; document.getElementById('emptyState').style.display = 'none'; document.getElementById('errorState').style.display = 'none'; document.getElementById('paginationWrapper').style.display = 'none'; },
+            hideLoading() { this.state.isLoading = false; document.getElementById('loadingState').style.display = 'none'; },
+            showError(message) { document.getElementById('loadingState').style.display = 'none'; document.getElementById('tableWrapper').style.display = 'none'; document.getElementById('emptyState').style.display = 'none'; document.getElementById('errorState').style.display = 'flex'; document.getElementById('errorMessage').textContent = message || 'Failed to load tickets'; document.getElementById('paginationWrapper').style.display = 'none'; },
+            hideError() { document.getElementById('errorState').style.display = 'none'; },
+            viewTicket(id) { /* Show details when clicking view */ this.showMoreInfo(id); },
+            assignTicket(id) { console.log('Assign ticket:', id); /* TODO: implement assign UI */ },
+            async showMoreInfo(id) {
+                const ticket = this.state.tickets.find(t => t.id === id);
+                if (!ticket) return;
+
+                document.getElementById('detailTicketNo').textContent = ticket.id || '';
+                document.getElementById('detailDate').textContent = this.formatDateTime(ticket.createdAt);
+                document.getElementById('detailName').textContent = ticket.createdBy?.fullName || ticket.createdBy?.username || '';
+                document.getElementById('detailDept').textContent = ticket.createdBy?.department || '';
+                document.getElementById('detailTitle').textContent = ticket.title || '';
+                document.getElementById('detailDescription').textContent = ticket.description || '';
+                document.getElementById('detailCategory').textContent = ticket.category || '';
+                document.getElementById('detailPriority').textContent = ticket.priority || '';
+                document.getElementById('detailStatus').textContent = this.formatStatus(ticket.status);
+                document.getElementById('detailCreatedBy').textContent = ticket.createdBy?.fullName || ticket.createdBy?.username || 'User';
+                document.getElementById('detailAssignedTo').textContent = ticket.assignedTo?.fullName || ticket.assignedTo?.username || 'Unassigned';
+
+                // store current id for update
+                this._currentDetailId = id;
+
+                // populate close form fields
+                const closeNo = document.getElementById('closeTicketNo');
+                if (closeNo) closeNo.value = ticket.id || '';
+                const commentEl = document.getElementById('closeComment');
+                if (commentEl) commentEl.value = '';
+
+                // load users/teams and populate selects
+                await this.fetchUsersForTeams();
+                const preferredDept = ticket.assignedTo?.department || ticket.createdBy?.department || '';
+                this.populateTeamSelect(preferredDept);
+                // set selected member if present
+                const memberSelect = document.getElementById('closeMemberSelect');
+                if (memberSelect && ticket.assignedTo && ticket.assignedTo.id) {
+                    memberSelect.value = ticket.assignedTo.id;
+                }
+
+
+
+                // show modal
+                document.getElementById('ticketDetailsModal').style.display = 'flex';
+            },
+            closeTicketModal() {
+                document.getElementById('ticketDetailsModal').style.display = 'none';
+                this._currentDetailId = null;
+            },
+            async updateTicket() {
+                if (!this._currentDetailId) return;
+
+                // Placeholder: real implementation should open an edit form or send PATCH to API with updated fields
+                try {
+                    // For now: close modal and refresh list
+                    this.closeTicketModal();
+                    await this.fetchTickets();
+                } catch (err) {
+                    console.error('Error updating ticket:', err);
+                }
+            },
+
+            // --- Team & Close helpers ---
+            async fetchUsersForTeams(force = false) {
+                if (this._allUsers && !force) return this._allUsers;
+                try {
+                    const authHeader = AuthManager.getAuthHeader();
+                    const headers = { 'Accept': 'application/json' };
+                    if (authHeader) headers['Authorization'] = authHeader;
+                    const res = await fetch('/api/users', { headers });
+                    if (!res.ok) throw new Error('Failed to fetch users');
+                    const body = await res.json();
+                    const users = body && Array.isArray(body) ? body : (body.data || []);
+                    this._allUsers = users;
+                    this._teamsMap = {};
+                    users.forEach(u => {
+                        const dept = u.department || 'Unspecified';
+                        if (!this._teamsMap[dept]) this._teamsMap[dept] = [];
+                        this._teamsMap[dept].push(u);
+                    });
+                    return users;
+                } catch (err) {
+                    console.warn('Could not load users for teams:', err);
+                    this._allUsers = [];
+                    this._teamsMap = {};
+                    return [];
+                }
+            },
+
+            populateTeamSelect(selectedDept) {
+                const teamSelect = document.getElementById('closeTeamSelect');
+                const memberSelect = document.getElementById('closeMemberSelect');
+                teamSelect.innerHTML = '';
+                const depts = Object.keys(this._teamsMap || {});
+                if (depts.length === 0) {
+                    teamSelect.innerHTML = '<option value="">No teams</option>';
+                    memberSelect.innerHTML = '<option value="">No members</option>';
+                    return;
+                }
+                depts.forEach(dept => {
+                    const opt = document.createElement('option');
+                    opt.value = dept;
+                    opt.textContent = dept;
+                    teamSelect.appendChild(opt);
+                });
+                if (selectedDept && depts.includes(selectedDept)) teamSelect.value = selectedDept;
+                this.onTeamChange();
+
+                // hook reload button
+                document.getElementById('reloadTeamsBtn')?.addEventListener('click', async () => {
+                    await this.fetchUsersForTeams(true);
+                    this.populateTeamSelect(teamSelect.value);
+                });
+            },
+
+            onTeamChange() {
+                const teamSelect = document.getElementById('closeTeamSelect');
+                const memberSelect = document.getElementById('closeMemberSelect');
+                memberSelect.innerHTML = '';
+                const users = (this._teamsMap && this._teamsMap[teamSelect.value]) || [];
+                if (users.length === 0) {
+                    memberSelect.innerHTML = '<option value="">No members</option>';
+                    return;
+                }
+                users.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = u.fullName || u.username;
+                    memberSelect.appendChild(opt);
+                });
+            },
+
+            async quickClose(id) {
+                // Quick close: show modal, set a quick comment and execute close flow
+                try {
+                    this.showMoreInfo(id);
+                    // small delay so modal values are populated
+                    await new Promise(r => setTimeout(r, 150));
+                    const commentEl = document.getElementById('closeComment');
+                    if (commentEl) commentEl.value = 'Closed quickly by IT Support';
+                    await this.closeTicketWithForm();
+                } catch (err) {
+                    console.error('quickClose failed:', err);
+                    alert('Quick close failed: ' + (err.message || err));
+                }
+            },
+
+            async closeTicketWithForm() {
+                if (!this._currentDetailId) return;
+                if (!confirm('Bạn có chắc chắn muốn đóng ticket này?')) return;
+
+                const ticketId = this._currentDetailId;
+                const assigneeId = document.getElementById('closeMemberSelect')?.value;
+                const comment = document.getElementById('closeComment')?.value || '';
+                const authHeader = AuthManager.getAuthHeader();
+                if (!authHeader) { AuthManager.logout(); return; }
+
+                try {
+                    // If assignee chosen, assign first
+                    if (assigneeId) {
+                        try {
+                            await fetch(`${this.API_BASE_URL}/${ticketId}/assign`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                                body: JSON.stringify({ assigneeId })
+                            });
+                        } catch (err) {
+                            console.warn('Assign request failed (non-fatal):', err);
+                        }
+                    }
+
+                    // Post comment if provided
+                    if (comment.trim()) {
+                        await fetch(`${this.API_BASE_URL}/${ticketId}/comments`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                            body: JSON.stringify({ content: comment.trim() })
+                        }).then(r => { if (!r.ok) throw new Error('Add comment failed'); });
+                    }
+
+                    // Update status to CLOSED
+                    await fetch(`${this.API_BASE_URL}/${ticketId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                        body: JSON.stringify({ status: 'CLOSED' })
+                    }).then(r => { if (!r.ok) throw new Error('Close failed'); });
+
+                    alert('Ticket closed successfully');
+                    await this.fetchTickets();
+                    this.closeTicketModal();
+                } catch (err) {
+                    console.error('Error in closeTicketWithForm:', err);
+                    alert('Error closing ticket: ' + (err.message || err));
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => { TicketsManager.init(); });
+    </script>
+</body>
+</html>
