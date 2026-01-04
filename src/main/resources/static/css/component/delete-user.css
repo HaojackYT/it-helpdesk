@@ -1,0 +1,514 @@
+/* Delete User Modal Styles */
+:root {
+    --primary-color: #4ecdc4;
+    --primary-dark: #44a08d;
+    --danger-color: #ef4444;
+    --danger-dark: #dc2626;
+    --warning-color: #f59e0b;
+    --success-color: #10b981;
+    
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-hover: #f3f4f6;
+    --border-color: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
+    
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Container */
+.modal-container {
+    background-color: var(--bg-primary);
+    border-radius: 16px;
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Header */
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-close:active {
+    transform: rotate(90deg) scale(0.95);
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 28px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Custom Scrollbar */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* User Info Grid */
+.user-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+}
+
+.info-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+/* Roles Row */
+.roles-row {
+    grid-template-columns: 160px 1fr;
+    align-items: start;
+}
+
+.role-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.role-admin {
+    background-color: #ffd700;
+    color: var(--text-primary);
+}
+
+.role-support {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.role-employee {
+    background-color: #ffc0cb;
+    color: var(--text-primary);
+}
+
+/* Warning Message */
+.warning-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 20px;
+    background-color: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.warning-message svg {
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.warning-message p {
+    font-size: 14px;
+    color: #92400e;
+    line-height: 1.6;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-delete {
+    height: 48px;
+    padding: 0 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cancel Button */
+.btn-cancel {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-cancel:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--text-tertiary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cancel:active {
+    transform: translateY(0);
+}
+
+/* Delete Button */
+.btn-delete {
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    min-width: 140px;
+}
+
+.btn-delete::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-delete:hover::before {
+    left: 100%;
+}
+
+.btn-delete:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+.btn-delete:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:disabled {
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Loading State */
+.btn-delete.loading {
+    pointer-events: none;
+    position: relative;
+}
+
+.btn-delete.loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .modal-overlay {
+        padding: 12px;
+    }
+
+    .modal-container {
+        border-radius: 12px;
+        max-height: 95vh;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .modal-close {
+        width: 32px;
+        height: 32px;
+    }
+
+    .modal-body {
+        padding: 24px 20px;
+    }
+
+    .info-row {
+        grid-template-columns: 120px 1fr;
+        gap: 12px;
+        padding: 12px 0;
+    }
+
+    .info-label {
+        font-size: 13px;
+    }
+
+    .info-value {
+        font-size: 14px;
+    }
+
+    .roles-row {
+        grid-template-columns: 120px 1fr;
+    }
+
+    .role-badge {
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+
+    .warning-message {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+
+    .warning-message p {
+        font-size: 13px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .btn-cancel,
+    .btn-delete {
+        width: 100%;
+        height: 46px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-title {
+        font-size: 18px;
+    }
+
+    .info-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .roles-row {
+        grid-template-columns: 1fr;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: var(--text-tertiary);
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .role-badges {
+        gap: 8px;
+    }
+
+    .role-badge {
+        padding: 6px 12px;
+        font-size: 10px;
+    }
+}
+
+/* Hover Effects for Info Rows */
+.info-row {
+    transition: background-color 0.2s ease;
+}
+
+.info-row:hover {
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* Animation for role badges */
+.role-badge {
+    animation: fadeInScale 0.3s ease-out backwards;
+}
+
+.role-badge:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.role-badge:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.role-badge:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Pulse animation for delete button */
+@keyframes dangerPulse {
+    0%, 100% {
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+    }
+}
+
+.btn-delete:focus {
+    animation: dangerPulse 1.5s ease-in-out infinite;
+}
