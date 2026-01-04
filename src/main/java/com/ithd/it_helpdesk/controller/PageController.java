@@ -21,9 +21,14 @@ public class PageController {
         return "admin/admin-dashboard";
     }
 
-       @GetMapping("/admin/tickets")
+    @GetMapping("/admin/tickets")
     public String adminTickets() {
         return "admin/admin-tickets";
+    }
+
+    @GetMapping("/admin/users")
+    public String adminUsers() {
+        return "admin/admin-users";
     }
     
     @GetMapping("/support/dashboard")
