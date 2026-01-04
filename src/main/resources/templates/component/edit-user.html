@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User Modal</title>
+    <link rel="stylesheet" href="edit-user.css">
+</head>
+<body>
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="editUserModal" style="display: none;">
+        <div class="modal-container">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title">Edit User</h2>
+                <button class="modal-close" aria-label="Close modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form class="edit-user-form" id="editUserForm">
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label class="form-label" for="editFullName">Full Name</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="editFullName" 
+                            placeholder="System Administrator"
+                            required
+                        >
+                    </div>
+
+                    <!-- Current Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="editPassword">Current Password</label>
+                        <input 
+                            type="password" 
+                            class="form-input" 
+                            id="editPassword" 
+                            placeholder="password123"
+                            required
+                        >
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="editEmail">Email</label>
+                        <input 
+                            type="email" 
+                            class="form-input" 
+                            id="editEmail" 
+                            placeholder="admin@company.com"
+                            required
+                        >
+                    </div>
+
+                    <!-- Department -->
+                    <div class="form-group">
+                        <label class="form-label" for="editDepartment">Department</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="editDepartment" 
+                            placeholder="IT Department"
+                            required
+                        >
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="form-group">
+                        <label class="form-label">Roles</label>
+                        <div class="role-buttons">
+                            <button type="button" class="role-btn role-btn-active" data-role="ADMIN">
+                                ADMIN
+                            </button>
+                            <button type="button" class="role-btn" data-role="IT SUPPORT">
+                                IT SUPPORT
+                            </button>
+                            <button type="button" class="role-btn" data-role="EMPLOYEE">
+                                EMPLOYEE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-submit">
+                        Update User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('editUserModal');
+        const closeBtn = document.querySelector('.modal-close');
+        const form = document.getElementById('editUserForm');
+        const roleButtons = document.querySelectorAll('.role-btn');
+
+        // Close modal
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Role button toggle
+        roleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Toggle active state
+                btn.classList.toggle('role-btn-active');
+            });
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                fullName: document.getElementById('editFullName').value,
+                password: document.getElementById('editPassword').value,
+                email: document.getElementById('editEmail').value,
+                department: document.getElementById('editDepartment').value,
+                roles: Array.from(document.querySelectorAll('.role-btn-active')).map(btn => btn.dataset.role)
+            };
+
+            console.log('Update user data:', formData);
+            
+            // Here you would typically send the data to your backend
+            // For now, we'll just close the modal
+            modal.style.display = 'none';
+            
+            // Show success message (you can customize this)
+            alert('User updated successfully!');
+        });
+
+        // Function to open modal with user data
+        function openEditModal(userData) {
+            document.getElementById('editFullName').value = userData.fullName || '';
+            document.getElementById('editPassword').value = userData.password || '';
+            document.getElementById('editEmail').value = userData.email || '';
+            document.getElementById('editDepartment').value = userData.department || '';
+            
+            // Set roles
+            roleButtons.forEach(btn => {
+                btn.classList.remove('role-btn-active');
+                if (userData.roles && userData.roles.includes(btn.dataset.role)) {
+                    btn.classList.add('role-btn-active');
+                }
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        // Make function globally accessible
+        window.openEditModal = openEditModal;
+    </script>
+</body>
+</html>

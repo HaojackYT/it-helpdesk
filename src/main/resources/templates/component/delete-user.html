@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete User Modal</title>
+    <link rel="stylesheet" href="delete-user-modal.css">
+</head>
+<body>
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="deleteUserModal" style="display: none;">
+        <div class="modal-container">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title">Delete User</h2>
+                <button class="modal-close" aria-label="Close modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="user-info-grid">
+                    <!-- ID -->
+                    <div class="info-row">
+                        <span class="info-label">ID</span>
+                        <span class="info-value" id="deleteUserId">1134</span>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="info-row">
+                        <span class="info-label">Username</span>
+                        <span class="info-value" id="deleteUsername">admin</span>
+                    </div>
+
+                    <!-- Current Password -->
+                    <div class="info-row">
+                        <span class="info-label">Current Password</span>
+                        <span class="info-value" id="deletePassword">password123</span>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="info-row">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value" id="deleteFullName">System Administrator</span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value" id="deleteEmail">admin@company.com</span>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="info-row">
+                        <span class="info-label">Department</span>
+                        <span class="info-value" id="deleteDepartment">IT Department</span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value" id="deleteStatus">Active</span>
+                    </div>
+
+                    <!-- Create at -->
+                    <div class="info-row">
+                        <span class="info-label">Create at</span>
+                        <span class="info-value" id="deleteCreateAt">4:21:30 30/12/2025</span>
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="info-row roles-row">
+                        <span class="info-label">Roles</span>
+                        <div class="role-badges" id="deleteRoles">
+                            <span class="role-badge role-admin">ADMIN</span>
+                            <span class="role-badge role-support">IT SUPPORT</span>
+                            <span class="role-badge role-employee">EMPLOYEE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Message -->
+                <div class="warning-message">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="btnCancel">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn-delete" id="btnDelete">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('deleteUserModal');
+        const closeBtn = document.querySelector('.modal-close');
+        const cancelBtn = document.getElementById('btnCancel');
+        const deleteBtn = document.getElementById('btnDelete');
+
+        // Close modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeModal();
+            }
+        });
+
+        // Delete button handler
+        deleteBtn.addEventListener('click', () => {
+            const userId = document.getElementById('deleteUserId').textContent;
+            
+            console.log('Deleting user:', userId);
+            
+            // Here you would typically send a delete request to your backend
+            // For now, we'll just show a confirmation and close the modal
+            
+            // Add loading state
+            deleteBtn.classList.add('loading');
+            deleteBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                deleteBtn.classList.remove('loading');
+                deleteBtn.disabled = false;
+                closeModal();
+                alert('User deleted successfully!');
+            }, 1500);
+        });
+
+        // Function to open modal with user data
+        function openDeleteModal(userData) {
+            document.getElementById('deleteUserId').textContent = userData.id || '';
+            document.getElementById('deleteUsername').textContent = userData.username || '';
+            document.getElementById('deletePassword').textContent = userData.password || '';
+            document.getElementById('deleteFullName').textContent = userData.fullName || '';
+            document.getElementById('deleteEmail').textContent = userData.email || '';
+            document.getElementById('deleteDepartment').textContent = userData.department || '';
+            document.getElementById('deleteStatus').textContent = userData.status || '';
+            document.getElementById('deleteCreateAt').textContent = userData.createAt || '';
+            
+            // Set roles
+            const rolesContainer = document.getElementById('deleteRoles');
+            rolesContainer.innerHTML = '';
+            
+            if (userData.roles && userData.roles.length > 0) {
+                userData.roles.forEach(role => {
+                    const badge = document.createElement('span');
+                    badge.className = 'role-badge';
+                    
+                    if (role === 'ADMIN') {
+                        badge.classList.add('role-admin');
+                    } else if (role === 'IT SUPPORT') {
+                        badge.classList.add('role-support');
+                    } else if (role === 'EMPLOYEE') {
+                        badge.classList.add('role-employee');
+                    }
+                    
+                    badge.textContent = role;
+                    rolesContainer.appendChild(badge);
+                });
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // Make function globally accessible
+        window.openDeleteModal = openDeleteModal;
+    </script>
+</body>
+</html>
