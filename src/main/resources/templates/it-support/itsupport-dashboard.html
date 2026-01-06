@@ -187,14 +187,48 @@
             }
 
             async function fetchMyTickets() {
-                // Bật dòng dưới khi có API
-                // const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.MY_TICKETS}`;
-                // const response = await fetch(url);
-                // if (!response.ok) throw new Error('Failed');
-                // const data = await response.json();
-                // return data.success ? data.data : [];
-                
-                return await fetchMyTicketsMock(); 
+                // Try fetching all tickets from the API (falls back to mock on error)
+                const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.TICKETS}`;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    headers['Authorization'] = `${localStorage.getItem('token_type') || 'Bearer'} ${token}`;
+                }
+
+                try {
+                    const response = await fetch(url, { headers });
+                    if (!response.ok) throw new Error('Failed to fetch tickets from API');
+                    const result = await response.json();
+                    if (result && Array.isArray(result)) return result;
+                    if (result && result.success && Array.isArray(result.data)) return result.data;
+                    return [];
+                } catch (err) {
+                    console.warn('API fetch failed, using mock data:', err);
+                    return await fetchMyTicketsMock();
+                }
+            }
+
+            function normalizeStatus(raw) {
+                if (!raw && raw !== 0) return '';
+                const s = raw.toString().trim().toUpperCase().replace(/\s+/g, '_').replace(/-+/g, '_');
+                if (s === 'INPROGRESS' || s === 'IN_PROGRESS' || s === 'IN-PROGRESS' || s === 'IN PROGRESS') return 'IN_PROGRESS';
+                if (s === 'ASSIGNED') return 'ASSIGNED';
+                if (s === 'OPEN') return 'OPEN';
+                if (s === 'RESOLVED') return 'RESOLVED';
+                if (s === 'CLOSED') return 'CLOSED';
+                return s;
+            }
+
+            function normalizePriority(raw) {
+                if (!raw && raw !== 0) return '';
+                const p = raw.toString().trim().toUpperCase();
+                if (p === 'HIGH' || p === 'H') return 'HIGH';
+                if (p === 'MEDIUM' || p === 'M') return 'MEDIUM';
+                if (p === 'LOW' || p === 'L') return 'LOW';
+                return p;
             }
 
             function calculateStatistics(tickets) {
@@ -205,13 +239,22 @@
                 };
 
                 tickets.forEach(ticket => {
-                    if (['RESOLVED', 'CLOSED'].includes(ticket.status)) stats.solved++;
-                    if (ticket.status === 'ASSIGNED') stats.assigned++;
-                    if (ticket.status === 'IN_PROGRESS') stats.inProgress++;
+                    const status = normalizeStatus(ticket.status);
+                    const priority = normalizePriority(ticket.priority);
 
-                    if (ticket.priority === 'LOW') stats.priorityLow++;
-                    else if (ticket.priority === 'MEDIUM') stats.priorityMedium++;
-                    else if (ticket.priority === 'HIGH') stats.priorityHigh++;
+                    // Solved includes RESOLVED and CLOSED
+                    if (['RESOLVED', 'CLOSED'].includes(status)) stats.solved++;
+
+                    // Assigned: count tickets whose status is ASSIGNED
+                    if (status === 'ASSIGNED') stats.assigned++;
+
+                    // In Progress strictly counts IN_PROGRESS status
+                    if (status === 'IN_PROGRESS') stats.inProgress++;
+
+                    // Priorities
+                    if (priority === 'LOW') stats.priorityLow++;
+                    else if (priority === 'MEDIUM') stats.priorityMedium++;
+                    else if (priority === 'HIGH') stats.priorityHigh++;
                 });
                 return stats;
             }

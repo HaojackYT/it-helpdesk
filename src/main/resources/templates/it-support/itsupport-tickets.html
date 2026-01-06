@@ -154,6 +154,7 @@
                             <th class="th-priority">Priority</th>
                             <th class="th-created">Created At</th>
                             <th class="th-status">Status</th>
+                            <th class="th-status-update">Update</th>
                             <th class="th-action">Action</th>
                         </tr>
                     </thead>
@@ -210,29 +211,40 @@
                     </div>
                 </div>
 
-                <div class="modal-right close-panel">
-                    <h4>Close Ticket</h4>
-                    <div class="close-row">
-                        <label>Ticket No.</label>
-                        <input type="text" id="closeTicketNo" readonly>
-                    </div>
-                    <div class="close-row">
-                        <label>Team</label>
-                        <div class="team-controls">
-                            <select id="closeTeamSelect"></select>
-                            <button id="reloadTeamsBtn" class="icon-btn" title="Reload teams" aria-label="Reload teams">⟳</button>
+                <div class="modal-right">
+                    <!-- Assign Panel -->
+                    <div id="assignPanel" class="panel assign-panel" style="display:none;">
+                        <h4>Assign Ticket</h4>
+                        <div class="close-row">
+                            <label>Team</label>
+                            <div class="team-controls">
+                                <select id="closeTeamSelect"></select>
+                                <button id="reloadTeamsBtn" class="icon-btn" title="Reload teams" aria-label="Reload teams">⟳</button>
+                            </div>
+                        </div>
+                        <div class="close-row">
+                            <label>Team Member</label>
+                            <select id="closeMemberSelect"></select>
+                        </div>
+                        <div class="close-row actions">
+                            <button class="btn-assign" onclick="TicketsManager.assignTicketWithForm()">Assign</button>
                         </div>
                     </div>
-                    <div class="close-row">
-                        <label>Team Member</label>
-                        <select id="closeMemberSelect"></select>
-                    </div>
-                    <div class="close-row">
-                        <label>Comment</label>
-                        <textarea id="closeComment" placeholder="Add closing comment..."></textarea>
-                    </div>
-                    <div class="close-row actions">
-                        <button class="btn-close-ticket" onclick="TicketsManager.closeTicketWithForm()">Close Ticket</button>
+
+                    <!-- Close Panel -->
+                    <div id="closePanel" class="panel close-panel" style="display:none;">
+                        <h4>Close Ticket</h4>
+                        <div class="close-row">
+                            <label>Ticket No.</label>
+                            <input type="text" id="closeTicketNo" readonly>
+                        </div>
+                        <div class="close-row">
+                            <label>Comment</label>
+                            <textarea id="closeComment" placeholder="Add closing comment..."></textarea>
+                        </div>
+                        <div class="close-row actions">
+                            <button class="btn-close-ticket" onclick="TicketsManager.closeTicketWithForm()">Close Ticket</button>
+                        </div>
                     </div>
                 </div>
 
@@ -297,17 +309,20 @@
                         <td class="td-priority priority-${String(priority).toLowerCase()}">${priority}</td>
                         <td class="td-created">${createdAt}</td>
                         <td class="td-status">
-                            <span class="status-badge ${statusClass}">${this.formatStatus(status)}</span>
+                            <span class="status-badge ${statusClass}" id="statusBadge-${ticket.id}">${this.formatStatus(status)}</span>
+                        </td>
+                        <td class="td-status-update">
+                            <select id="statusSelect-${ticket.id}" class="status-select" onchange="TicketsManager.onStatusChange('${ticket.id}', this)" aria-label="Update status">
+                                <option value="OPEN" ${status === 'OPEN' ? 'selected' : ''}>${this.formatStatus('OPEN')}</option>
+                                <option value="ASSIGNED" ${status === 'ASSIGNED' ? 'selected' : ''}>${this.formatStatus('ASSIGNED')}</option>
+                                <option value="IN_PROGRESS" ${status === 'IN_PROGRESS' ? 'selected' : ''}>${this.formatStatus('IN_PROGRESS')}</option>
+                                <option value="RESOLVED" ${status === 'RESOLVED' ? 'selected' : ''}>${this.formatStatus('RESOLVED')}</option>
+                                <option value="CLOSED" ${status === 'CLOSED' ? 'selected' : ''}>${this.formatStatus('CLOSED')}</option>
+                            </select>
                         </td>
                         <td class="td-action">
                             <div class="action-buttons">
-                                <button class="action-btn" title="View Details" onclick="TicketsManager.viewTicket('${ticket.id}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </button>
-                                <button class="action-btn" title="Assign User" onclick="TicketsManager.assignTicket('${ticket.id}')">
+                                <button class="action-btn" title="Assign User" onclick="TicketsManager.assignTicket('${ticket.id}')" aria-label="Assign">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="9" cy="7" r="4"></circle>
@@ -365,8 +380,82 @@
             showError(message) { document.getElementById('loadingState').style.display = 'none'; document.getElementById('tableWrapper').style.display = 'none'; document.getElementById('emptyState').style.display = 'none'; document.getElementById('errorState').style.display = 'flex'; document.getElementById('errorMessage').textContent = message || 'Failed to load tickets'; document.getElementById('paginationWrapper').style.display = 'none'; },
             hideError() { document.getElementById('errorState').style.display = 'none'; },
             viewTicket(id) { /* Show details when clicking view */ this.showMoreInfo(id); },
-            assignTicket(id) { console.log('Assign ticket:', id); /* TODO: implement assign UI */ },
-            async showMoreInfo(id) {
+            async assignTicket(id) {
+                // open modal and populate team/member selects (show assign panel)
+                this.showMoreInfo(id, 'assign');
+                // small delay so modal values are populated
+                await new Promise(r => setTimeout(r, 150));
+                // focus member select
+                const memberSelect = document.getElementById('closeMemberSelect');
+                if (memberSelect) memberSelect.focus();
+                // store current assign id
+                this._assigningId = id;
+            },
+            async assignTicketWithForm() {
+                const id = this._assigningId || this._currentDetailId;
+                if (!id) return alert('No ticket selected to assign');
+                const assigneeId = document.getElementById('closeMemberSelect')?.value;
+                if (!assigneeId) return alert('Please select a team member to assign');
+                if (!confirm('Bạn có chắc chắn muốn gán ticket này cho thành viên đã chọn?')) return;
+                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
+                try {
+                    const res = await fetch(`${this.API_BASE_URL}/${id}/assign`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                        body: JSON.stringify({ assigneeId })
+                    });
+                    if (res.status === 401) { AuthManager.logout(); return; }
+                    if (res.status === 403) { throw new Error('Bạn không có quyền gán ticket'); }
+                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Assign failed'); }
+                    const body = await res.json(); const updated = body && body.data ? body.data : body;
+                    // update local ticket state and UI
+                    const ticket = this.state.tickets.find(t => t.id === id);
+                    if (ticket) {
+                        ticket.assignedTo = updated.assignedTo || ticket.assignedTo;
+                        ticket.status = updated.status || ticket.status;
+                    }
+                    // refresh list and modal
+                    await this.fetchTickets();
+                    alert('Ticket assigned successfully');
+                    // clear assign state and close modal
+                    this._assigningId = null; this.closeTicketModal();
+                } catch (err) {
+                    console.error('Assign failed:', err);
+                    alert('Assign failed: ' + (err.message || err));
+                }
+            },
+            async onStatusChange(id, selectEl) {
+                const newStatus = selectEl?.value;
+                const ticket = this.state.tickets.find(t => t.id === id);
+                const prevStatus = ticket?.status;
+                if (!newStatus || newStatus === prevStatus) return;
+                selectEl.disabled = true;
+                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
+                try {
+                    const res = await fetch(`${this.API_BASE_URL}/${id}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    if (res.status === 401) { AuthManager.logout(); return; }
+                    if (res.status === 403) { throw new Error('You do not have permission to update status'); }
+                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Failed to update status'); }
+                    const body = await res.json();
+                    const updated = body && body.data ? body.data : body;
+                    if (ticket) {
+                        ticket.status = updated.status || newStatus;
+                        const badge = document.getElementById(`statusBadge-${id}`);
+                        if (badge) { badge.textContent = this.formatStatus(ticket.status); badge.className = `status-badge ${this.getStatusClass(ticket.status)}`; }
+                        if (this._currentDetailId === id) { document.getElementById('detailStatus').textContent = this.formatStatus(ticket.status); }
+                    }
+                    this.filterAndRenderTickets();
+                } catch (err) {
+                    console.error('Error updating ticket status:', err);
+                    alert(err.message || 'Failed to update status');
+                    if (selectEl) selectEl.value = prevStatus || 'OPEN';
+                } finally { if (selectEl) selectEl.disabled = false; }
+            },
+            async showMoreInfo(id, panel = null) {
                 const ticket = this.state.tickets.find(t => t.id === id);
                 if (!ticket) return;
 
@@ -401,7 +490,13 @@
                     memberSelect.value = ticket.assignedTo.id;
                 }
 
-
+                // show/hide panels based on requested action
+                const assignPanel = document.getElementById('assignPanel');
+                const closePanel = document.getElementById('closePanel');
+                if (assignPanel) assignPanel.style.display = (panel === 'assign') ? 'block' : 'none';
+                if (closePanel) closePanel.style.display = (panel === 'close') ? 'block' : 'none';
+                const modalRight = document.querySelector('.modal-right');
+                if (modalRight) modalRight.style.display = (panel === 'assign' || panel === 'close') ? 'block' : 'none';
 
                 // show modal
                 document.getElementById('ticketDetailsModal').style.display = 'flex';
@@ -409,6 +504,7 @@
             closeTicketModal() {
                 document.getElementById('ticketDetailsModal').style.display = 'none';
                 this._currentDetailId = null;
+                this._assigningId = null;
             },
             async updateTicket() {
                 if (!this._currentDetailId) return;
@@ -496,7 +592,7 @@
             async quickClose(id) {
                 // Quick close: show modal, set a quick comment and execute close flow
                 try {
-                    this.showMoreInfo(id);
+                    this.showMoreInfo(id, 'close');
                     // small delay so modal values are populated
                     await new Promise(r => setTimeout(r, 150));
                     const commentEl = document.getElementById('closeComment');
@@ -507,6 +603,7 @@
                     alert('Quick close failed: ' + (err.message || err));
                 }
             },
+
 
             async closeTicketWithForm() {
                 if (!this._currentDetailId) return;
