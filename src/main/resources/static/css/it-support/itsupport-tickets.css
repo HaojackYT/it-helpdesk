@@ -202,6 +202,11 @@ body {
 .status-open { background-color: var(--status-open); color: #ffffff; }
 .status-progress { background-color: var(--status-progress); color: #000000; }
 
+/* Status Select Column */
+.th-status-update, .td-status-update { width: 140px; }
+.status-select { height: 36px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer; outline: none; }
+.status-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(78,205,196,0.06); }
+
 /* Action Buttons */
 .action-buttons { display: flex; gap: 8px; align-items: center; }
 .action-btn { width: 32px; height: 32px; border: 1px solid var(--border-color); background-color: var(--bg-primary); color: var(--text-secondary); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; position: relative; }
@@ -312,6 +317,8 @@ body {
 .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); cursor: pointer; }
 
 .actions { display: flex; justify-content: flex-end; }
+.btn-assign { background: #10b981; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 700; margin-right: 8px; }
+.btn-assign:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .btn-close-ticket { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; }
 .btn-close-ticket:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
