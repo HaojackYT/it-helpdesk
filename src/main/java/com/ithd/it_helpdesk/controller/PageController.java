@@ -28,7 +28,7 @@ public class PageController {
 
     @GetMapping("/admin/users")
     public String adminUsers() {
-        return "admin/admin-users";
+        return "admin/admin-user";
     }
     
     @GetMapping("/support/dashboard")
