@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Ticket Modal</title>
+    <link rel="stylesheet" href="modal-assign-ticket.css">
+</head>
+<body>
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="assignTicketModal">
+        <div class="modal-container">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title">Assign Ticket</h2>
+                <button class="modal-close" aria-label="Close modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form class="ticket-form" id="assignTicketForm">
+                    <!-- ID Field -->
+                    <div class="form-group">
+                        <label class="form-label">ID</label>
+                        <input type="text" class="form-input" value="1234" readonly>
+                    </div>
+
+                    <!-- Title Field -->
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-input" value="New computer setup request" readonly>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" rows="3" readonly>I need a new computer setup for my workstation. The curre</textarea>
+                    </div>
+
+                    <!-- Category Field -->
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <input type="text" class="form-input" value="HARDWARE" readonly>
+                    </div>
+
+                    <!-- Priority Field -->
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <input type="text" class="form-input" value="MEDIUM" readonly>
+                    </div>
+
+                    <!-- Create at Field -->
+                    <div class="form-group">
+                        <label class="form-label">Create at</label>
+                        <input type="text" class="form-input" value="4:21:30 30/12/2025" readonly>
+                    </div>
+
+                    <!-- Status Field -->
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <input type="text" class="form-input" value="RESOLVED" readonly>
+                    </div>
+
+                    <!-- Employee Field -->
+                    <div class="form-group">
+                        <label class="form-label">Employee</label>
+                        <input type="text" class="form-input" value="Alice Employee" readonly>
+                    </div>
+
+                    <!-- IT Support Label -->
+                    <div class="form-group">
+                        <label class="form-label-section">IT Support</label>
+                    </div>
+
+                    <!-- IT Support Dropdown -->
+                    <div class="form-group">
+                        <select class="form-select">
+                            <option value="">Select IT Support</option>
+                            <option value="john" selected>John IT Support</option>
+                            <option value="jane">Jane IT Support</option>
+                            <option value="bob">Bob IT Support</option>
+                        </select>
+                    </div>
+
+                    <!-- Comment Field -->
+                    <div class="form-group">
+                        <label class="form-label">Comment:</label>
+                        <textarea class="form-textarea" rows="4" placeholder="Add your comment here..."></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn-secondary" type="button">Cancel</button>
+                <button class="btn-primary btn-update" type="submit">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('assignTicketModal');
+        const closeBtn = document.querySelector('.modal-close');
+        const cancelBtn = document.querySelector('.btn-secondary');
+        const form = document.getElementById('assignTicketForm');
+
+        // Close modal function
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Close on close button click
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close on cancel button click
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            console.log('Form submitted');
+            // Add your form submission logic here
+            closeModal();
+        });
+    </script>
+</body>
+</html>
