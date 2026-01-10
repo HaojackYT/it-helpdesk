@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Helpdesk - Employee Dashboard</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/employee/employee-sidebar.css">
+    <link rel="stylesheet" href="/css/employee/employee-dashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">IT Helpdesk</h1>
+            <div class="header-actions">
+                <span class="user-greeting" id="userGreeting">Welcome, Employee</span>
+                <button class="btn-icon btn-user" aria-label="User profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+                <button class="btn-icon btn-logout" id="logoutBtn" aria-label="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <a href="/employee/dashboard" class="menu-link" title="Dashboard">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item">
+                    <a href="/employee/new-ticket" class="menu-link" title="New Ticket">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <span class="menu-text">New Ticket</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item">
+                    <a href="/employee/my-tickets" class="menu-link" title="My Tickets">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span class="menu-text">My Tickets</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <h2 class="dashboard-title">Employee Dashboard</h2>
+            
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+                <p>Loading dashboard...</p>
+            </div>
+
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <!-- Total Tickets -->
+                <div class="stat-card stat-card-primary">
+                    <div class="stat-header">Total Tickets</div>
+                    <div class="stat-value" id="totalTickets">0</div>
+                </div>
+
+                <!-- In Progress -->
+                <div class="stat-card stat-card-yellow">
+                    <div class="stat-header">In Progress</div>
+                    <div class="stat-value" id="inProgressTickets">0</div>
+                </div>
+
+                <!-- Resolved -->
+                <div class="stat-card stat-card-success">
+                    <div class="stat-header">Resolved</div>
+                    <div class="stat-value" id="resolvedTickets">0</div>
+                </div>
+            </div>
+
+            <!-- Last Updated Section -->
+            <div class="last-updated">
+                <span id="lastUpdated">Last updated: Loading...</span>
+                <button class="refresh-btn" id="refreshBtn" aria-label="Refresh data">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ========================================
+        // API Configuration & Constants
+        // ========================================
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const TOKEN_KEY = 'auth_token';  // Match with login.html
+        const USER_INFO_KEY = 'user_info';
+
+        // ========================================
+        // Authentication & Authorization Helper
+        // ========================================
+        const AuthManager = {
+            // Get JWT token from localStorage
+            getToken() {
+                return localStorage.getItem(TOKEN_KEY);
+            },
+
+            // Save token to localStorage
+            setToken(token) {
+                localStorage.setItem(TOKEN_KEY, token);
+            },
+
+            // Get user info from localStorage
+            getUserInfo() {
+                const userInfo = localStorage.getItem(USER_INFO_KEY);
+                return userInfo ? JSON.parse(userInfo) : null;
+            },
+
+            // Save user info to localStorage
+            setUserInfo(userInfo) {
+                localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
+            },
+
+            // Check if user is authenticated
+            isAuthenticated() {
+                return !!this.getToken();
+            },
+
+            // Check if user has specific role
+            hasRole(role) {
+                const userInfo = this.getUserInfo();
+                return userInfo && userInfo.roles && userInfo.roles.includes(role);
+            },
+
+            // Check if user has any of the specified roles
+            hasAnyRole(roles) {
+                return roles.some(role => this.hasRole(role));
+            },
+
+            // Logout - clear all auth data
+            logout() {
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(USER_INFO_KEY);
+                window.location.href = '/login';
+            },
+
+            // Redirect if not authenticated
+            requireAuth() {
+                if (!this.isAuthenticated()) {
+                    window.location.href = '/login';
+                    return false;
+                }
+                return true;
+            },
+
+            // Check if user is EMPLOYEE
+            isEmployee() {
+                return this.hasRole('ROLE_EMPLOYEE');
+            }
+        };
+
+        // ========================================
+        // API Helper Functions
+        // ========================================
+        const ApiClient = {
+            // Generic API call with JWT authentication
+            async request(endpoint, options = {}) {
+                const token = AuthManager.getToken();
+                
+                const config = {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` }),
+                        ...options.headers
+                    }
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                    
+                    // Handle 401 Unauthorized
+                    if (response.status === 401) {
+                        AuthManager.logout();
+                        return null;
+                    }
+
+                    // Handle 403 Forbidden
+                    if (response.status === 403) {
+                        console.error('Access denied - insufficient permissions');
+                        return null;
+                    }
+
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'API request failed');
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            },
+
+            // GET request
+            async get(endpoint) {
+                return this.request(endpoint, { method: 'GET' });
+            },
+
+            // POST request
+            async post(endpoint, data) {
+                return this.request(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            },
+
+            // PUT request
+            async put(endpoint, data) {
+                return this.request(endpoint, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            },
+
+            // DELETE request
+            async delete(endpoint) {
+                return this.request(endpoint, { method: 'DELETE' });
+            }
+        };
+
+        // ========================================
+        // Dashboard Data Fetching
+        // ========================================
+        const DashboardAPI = {
+            // Get my tickets (employee's own tickets)
+            async getMyTickets() {
+                try {
+                    const response = await ApiClient.get('/tickets/my');
+                    return response && response.success ? response.data : [];
+                } catch (error) {
+                    console.error('Error fetching my tickets:', error);
+                    return [];
+                }
+            },
+
+            // Get ticket statistics/reports
+            async getTicketReport() {
+                try {
+                    const response = await ApiClient.get('/reports/tickets');
+                    return response && response.success ? response.data : null;
+                } catch (error) {
+                    console.error('Error fetching ticket report:', error);
+                    return null;
+                }
+            }
+        };
+
+        // ========================================
+        // Dashboard Statistics Calculator
+        // ========================================
+        const StatisticsCalculator = {
+            // Calculate statistics from my tickets
+            calculateFromMyTickets(tickets) {
+                const stats = {
+                    total: tickets.length,
+                    inProgress: 0,
+                    resolved: 0
+                };
+
+                tickets.forEach(ticket => {
+                    const status = ticket.status;
+                    
+                    // Count IN_PROGRESS and ASSIGNED as "In Progress"
+                    if (status === 'IN_PROGRESS' || status === 'ASSIGNED') {
+                        stats.inProgress++;
+                    }
+                    
+                    // Count RESOLVED and CLOSED as "Resolved"
+                    if (status === 'RESOLVED' || status === 'CLOSED') {
+                        stats.resolved++;
+                    }
+                });
+
+                return stats;
+            }
+        };
+
+        // ========================================
+        // UI Update Functions
+        // ========================================
+        const UIManager = {
+            // Update user greeting in header
+            updateUserGreeting() {
+                const userInfo = AuthManager.getUserInfo();
+                const greetingElement = document.getElementById('userGreeting');
+                
+                if (userInfo && greetingElement) {
+                    const displayName = userInfo.fullName || userInfo.username;
+                    greetingElement.textContent = `Welcome, ${displayName}`;
+                }
+            },
+
+            // Update statistics values with animation
+            updateStatValue(elementId, value) {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+                
+                element.textContent = value;
+                element.classList.add('updating');
+                
+                setTimeout(() => {
+                    element.classList.remove('updating');
+                }, 300);
+            },
+
+            // Update all dashboard statistics
+            updateStatistics(stats) {
+                this.updateStatValue('totalTickets', stats.total);
+                this.updateStatValue('inProgressTickets', stats.inProgress);
+                this.updateStatValue('resolvedTickets', stats.resolved);
+            },
+
+            // Update last updated time
+            updateLastUpdatedTime() {
+                const now = new Date();
+                const formattedTime = now.toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                const lastUpdatedElement = document.getElementById('lastUpdated');
+                if (lastUpdatedElement) {
+                    lastUpdatedElement.textContent = `Last updated: ${formattedTime}`;
+                }
+            },
+
+            // Show loading overlay
+            showLoading() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'flex';
+                }
+            },
+
+            // Hide loading overlay
+            hideLoading() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+            },
+
+            // Show error message
+            showError(message) {
+                alert(`Error: ${message}`);
+            }
+        };
+
+        // ========================================
+        // Main Dashboard Loading Function
+        // ========================================
+        async function loadDashboardData() {
+            UIManager.showLoading();
+
+            try {
+                // Fetch my tickets
+                const myTickets = await DashboardAPI.getMyTickets();
+                
+                // Calculate statistics from my tickets
+                const stats = StatisticsCalculator.calculateFromMyTickets(myTickets);
+                
+                // Update UI with statistics
+                UIManager.updateStatistics(stats);
+                
+                // Update last updated time
+                UIManager.updateLastUpdatedTime();
+                
+                console.log('Dashboard loaded successfully:', { stats, ticketCount: myTickets.length });
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                UIManager.showError('Failed to load dashboard data. Please try again.');
+            } finally {
+                UIManager.hideLoading();
+            }
+        }
+
+        // ========================================
+        // Sidebar Toggle Functionality
+        // ========================================
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+        const mainContent = document.querySelector('.main-content');
+        
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+            
+            // Store collapsed state
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+        
+        // Restore collapsed state on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+            }
+        });
+        
+        // ========================================
+        // Active Menu Item Handling
+        // ========================================
+        const menuLinks = document.querySelectorAll('.menu-link');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Remove active class from all items
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                link.parentElement.classList.add('active');
+            });
+        });
+
+        // ========================================
+        // Refresh Button Functionality
+        // ========================================
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            loadDashboardData();
+        });
+
+        // ========================================
+        // Logout Button Functionality
+        // ========================================
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                AuthManager.logout();
+            }
+        });
+
+        // ========================================
+        // Page Initialization
+        // ========================================
+        (function initializeDashboard() {
+            // Check authentication
+            if (!AuthManager.requireAuth()) {
+                return;
+            }
+
+            // Check if user is EMPLOYEE
+            if (!AuthManager.isEmployee()) {
+                alert('Access denied. This page is only for employees.');
+                window.location.href = '/login';
+                return;
+            }
+
+            // Update user greeting
+            UIManager.updateUserGreeting();
+
+            // Load dashboard data
+            loadDashboardData();
+        })();
+
+        // ========================================
+        // Mobile Menu Handling
+        // ========================================
+        if (window.innerWidth <= 768) {
+            const handleResize = () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('sidebar-collapsed');
+                }
+            };
+            
+            window.addEventListener('resize', handleResize);
+        }
+    </script>
+</body>
+</html>
