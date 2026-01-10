@@ -102,6 +102,18 @@
                     <div class="stat-value" id="totalTickets">0</div>
                 </div>
 
+                <!-- Open -->
+                <div class="stat-card stat-card-secondary">
+                    <div class="stat-header">Open</div>
+                    <div class="stat-value" id="openTickets">0</div>
+                </div>
+
+                <!-- Assigned -->
+                <div class="stat-card stat-card-warning">
+                    <div class="stat-header">Assigned</div>
+                    <div class="stat-value" id="assignedTickets">0</div>
+                </div>
+
                 <!-- In Progress -->
                 <div class="stat-card stat-card-yellow">
                     <div class="stat-header">In Progress</div>
@@ -112,6 +124,12 @@
                 <div class="stat-card stat-card-success">
                     <div class="stat-header">Resolved</div>
                     <div class="stat-value" id="resolvedTickets">0</div>
+                </div>
+
+                <!-- Closed -->
+                <div class="stat-card stat-card-danger">
+                    <div class="stat-header">Closed</div>
+                    <div class="stat-value" id="closedTickets">0</div>
                 </div>
             </div>
 
@@ -307,21 +325,27 @@
             calculateFromMyTickets(tickets) {
                 const stats = {
                     total: tickets.length,
+                    open: 0,
+                    assigned: 0,
                     inProgress: 0,
-                    resolved: 0
+                    resolved: 0,
+                    closed: 0
                 };
 
                 tickets.forEach(ticket => {
                     const status = ticket.status;
                     
-                    // Count IN_PROGRESS and ASSIGNED as "In Progress"
-                    if (status === 'IN_PROGRESS' || status === 'ASSIGNED') {
+                    // Count by exact status
+                    if (status === 'OPEN') {
+                        stats.open++;
+                    } else if (status === 'ASSIGNED') {
+                        stats.assigned++;
+                    } else if (status === 'IN_PROGRESS') {
                         stats.inProgress++;
-                    }
-                    
-                    // Count RESOLVED and CLOSED as "Resolved"
-                    if (status === 'RESOLVED' || status === 'CLOSED') {
+                    } else if (status === 'RESOLVED') {
                         stats.resolved++;
+                    } else if (status === 'CLOSED') {
+                        stats.closed++;
                     }
                 });
 
@@ -360,8 +384,11 @@
             // Update all dashboard statistics
             updateStatistics(stats) {
                 this.updateStatValue('totalTickets', stats.total);
+                this.updateStatValue('openTickets', stats.open);
+                this.updateStatValue('assignedTickets', stats.assigned);
                 this.updateStatValue('inProgressTickets', stats.inProgress);
                 this.updateStatValue('resolvedTickets', stats.resolved);
+                this.updateStatValue('closedTickets', stats.closed);
             },
 
             // Update last updated time
