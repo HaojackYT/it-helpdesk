@@ -17,6 +17,7 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final String fullName;
     private final String email;
+    private final String department;
     private final User.UserStatus status;
     private final Set<GrantedAuthority> authorities;
 
@@ -26,6 +27,7 @@ public class CustomUserDetails implements UserDetails {
         this.password = user.getPassword();
         this.fullName = user.getFullName();
         this.email = user.getEmail();
+        this.department = user.getDepartment();
         this.status = user.getStatus();
         this.authorities = authorities;
     }

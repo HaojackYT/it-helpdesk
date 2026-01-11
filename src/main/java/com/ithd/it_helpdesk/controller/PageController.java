@@ -45,4 +45,9 @@ public class PageController {
     public String employeeDashboard() {
         return "employee/employee-dashboard";
     }
+
+    @GetMapping("/employee/new-ticket")
+    public String employeeNewTicket() {
+        return "employee/employee-newticket";
+    }
 }

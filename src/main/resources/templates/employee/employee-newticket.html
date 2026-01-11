@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Helpdesk - New Ticket</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/employee/employee-sidebar.css">
+    <link rel="stylesheet" href="/css/employee/employee-newticket.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">IT Helpdesk</h1>
+            <div class="header-actions">
+                <button class="btn-icon btn-user" aria-label="User profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+                <button class="btn-icon btn-logout" id="logoutBtn" aria-label="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="/employee/dashboard" class="menu-link" title="Dashboard">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item active">
+                    <a href="/employee/new-ticket" class="menu-link" title="New Ticket">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <span class="menu-text">New Ticket</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item">
+                    <a href="/employee/my-tickets" class="menu-link" title="My Tickets">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span class="menu-text">My Tickets</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-container">
+            <h2 class="page-title">Create New Ticket</h2>
+            
+            <!-- Alert Container -->
+            <div id="alertContainer" class="alert-container"></div>
+            
+            <div class="form-card">
+                <form id="ticketForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Name:</label>
+                            <input type="text" id="name" class="form-input" placeholder="Your name" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date:</label>
+                            <input type="date" id="date" class="form-input" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group form-group-empty"></div>
+                        <div class="form-group">
+                            <label class="form-label">Department:</label>
+                            <input type="text" id="department" class="form-input" placeholder="Your department" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group form-group-full">
+                            <label class="form-label">Title: <span class="required">*</span></label>
+                            <input type="text" id="title" class="form-input" placeholder="Enter ticket title" required>
+                            <span class="error-message" id="titleError">Title is required</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1; grid-row: 1;">
+                            <label class="form-label">Category: <span class="required">*</span></label>
+                            <select id="category" class="form-select" required>
+                                <option value="">Select category</option>
+                                <option value="NETWORK">NETWORK</option>
+                                <option value="SOFTWARE">SOFTWARE</option>
+                                <option value="HARDWARE">HARDWARE</option>
+                                <option value="ACCOUNT">ACCOUNT</option>
+                            </select>
+                            <span class="error-message" id="categoryError">Category is required</span>
+                        </div>
+                        <div class="form-group" style="grid-column: 2; grid-row: 1 / 3;">
+                            <label class="form-label">Description:</label>
+                            <textarea id="description" class="form-textarea" placeholder="Enter ticket description" rows="5"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1; grid-row: 2;">
+                            <label class="form-label">Priority:</label>
+                            <select id="priority" class="form-select">
+                                <option value="">Select priority</option>
+                                <option value="LOW">LOW</option>
+                                <option value="MEDIUM">MEDIUM</option>
+                                <option value="HIGH">HIGH</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn" class="btn-submit">
+                            <span class="btn-text">Submit</span>
+                            <span class="btn-loader" style="display: none;">⟳</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Footer Area</p>
+        </div>
+    </footer>
+
+    <script>
+        // ========================================
+        // API Configuration & Constants
+        // ========================================
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const TOKEN_KEY = 'auth_token';
+        const USER_INFO_KEY = 'user_info';
+
+        // ========================================
+        // Authentication Manager
+        // ========================================
+        const AuthManager = {
+            getToken() {
+                return localStorage.getItem(TOKEN_KEY);
+            },
+
+            getUserInfo() {
+                const userInfo = localStorage.getItem(USER_INFO_KEY);
+                return userInfo ? JSON.parse(userInfo) : null;
+            },
+
+            isAuthenticated() {
+                return !!this.getToken();
+            },
+
+            hasRole(role) {
+                const userInfo = this.getUserInfo();
+                return userInfo && userInfo.roles && userInfo.roles.includes(role);
+            },
+
+            logout() {
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(USER_INFO_KEY);
+                window.location.href = '/login';
+            },
+
+            requireAuth() {
+                if (!this.isAuthenticated()) {
+                    window.location.href = '/login';
+                    return false;
+                }
+                return true;
+            },
+
+            isEmployee() {
+                return this.hasRole('ROLE_EMPLOYEE');
+            }
+        };
+
+        // ========================================
+        // API Client
+        // ========================================
+        const ApiClient = {
+            async request(endpoint, options = {}) {
+                const token = AuthManager.getToken();
+                
+                const config = {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` }),
+                        ...options.headers
+                    }
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                    
+                    if (response.status === 401) {
+                        AuthManager.logout();
+                        return null;
+                    }
+
+                    if (response.status === 403) {
+                        UIManager.showAlert('Access denied', 'error');
+                        return null;
+                    }
+
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'API request failed');
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            },
+
+            async post(endpoint, data) {
+                return this.request(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+        };
+
+        // ========================================
+        // Ticket API
+        // ========================================
+        const TicketAPI = {
+            async createTicket(ticketData) {
+                try {
+                    const response = await ApiClient.post('/tickets', ticketData);
+                    return response && response.success ? response.data : null;
+                } catch (error) {
+                    console.error('Error creating ticket:', error);
+                    throw error;
+                }
+            }
+        };
+
+        // ========================================
+        // UI Manager
+        // ========================================
+        const UIManager = {
+            showAlert(message, type = 'success') {
+                const alertContainer = document.getElementById('alertContainer');
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+                const icon = type === 'success' ? '✓' : '✕';
+                
+                alertContainer.innerHTML = `
+                    <div class="alert ${alertClass}">
+                        <span class="alert-icon">${icon}</span>
+                        <span class="alert-message">${message}</span>
+                        <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                `;
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    alertContainer.innerHTML = '';
+                }, 5000);
+            },
+
+            showFieldError(fieldId, errorId, message) {
+                const field = document.getElementById(fieldId);
+                const errorElement = document.getElementById(errorId);
+                
+                field.classList.add('input-error');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            },
+
+            clearFieldError(fieldId, errorId) {
+                const field = document.getElementById(fieldId);
+                const errorElement = document.getElementById(errorId);
+                
+                field.classList.remove('input-error');
+                if (errorElement) {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            },
+
+            clearAllErrors() {
+                this.clearFieldError('title', 'titleError');
+                this.clearFieldError('category', 'categoryError');
+            },
+
+            setLoading(isLoading) {
+                const submitBtn = document.getElementById('submitBtn');
+                if (!submitBtn) {
+                    console.error('Submit button not found!');
+                    return;
+                }
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnLoader = submitBtn.querySelector('.btn-loader');
+                
+                submitBtn.disabled = isLoading;
+                
+                if (isLoading) {
+                    submitBtn.classList.add('loading');
+                    btnText.style.opacity = '0';
+                    btnLoader.style.display = 'inline-block';
+                } else {
+                    submitBtn.classList.remove('loading');
+                    btnText.style.opacity = '1';
+                    btnLoader.style.display = 'none';
+                }
+            },
+
+            updateUserGreeting() {
+                const userInfo = AuthManager.getUserInfo();
+                const greetingElement = document.getElementById('userGreeting');
+                
+                if (userInfo && greetingElement) {
+                    const displayName = userInfo.fullName || userInfo.username;
+                    greetingElement.textContent = `Welcome, ${displayName}`;
+                }
+            },
+
+            prefillUserInfo() {
+                const userInfo = AuthManager.getUserInfo();
+                
+                if (userInfo) {
+                    // Fill name
+                    document.getElementById('name').value = userInfo.fullName || userInfo.username || '';
+                    
+                    // Fill current date
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('date').value = today;
+                    
+                    // Fill department from user info
+                    document.getElementById('department').value = userInfo.department || '';
+                }
+            }
+        };
+
+        // ========================================
+        // Form Validation
+        // ========================================
+        const FormValidator = {
+            validateForm() {
+                let isValid = true;
+                UIManager.clearAllErrors();
+
+                // Validate title
+                const title = document.getElementById('title').value.trim();
+                if (!title) {
+                    UIManager.showFieldError('title', 'titleError', 'Title is required');
+                    isValid = false;
+                } else if (title.length > 200) {
+                    UIManager.showFieldError('title', 'titleError', 'Title must not exceed 200 characters');
+                    isValid = false;
+                }
+
+                // Validate category
+                const category = document.getElementById('category').value;
+                if (!category) {
+                    UIManager.showFieldError('category', 'categoryError', 'Category is required');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+        };
+
+        // ========================================
+        // Form Submission Handler
+        // ========================================
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            console.log('Form submitted!');
+
+            // Validate form
+            if (!FormValidator.validateForm()) {
+                console.log('Validation failed');
+                return;
+            }
+
+            // Prepare ticket data
+            const ticketData = {
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim() || null,
+                category: document.getElementById('category').value,
+                priority: document.getElementById('priority').value || 'MEDIUM'
+            };
+            
+            console.log('Ticket data:', ticketData);
+
+            try {
+                console.log('Setting loading state...');
+                UIManager.setLoading(true);
+
+                // Create ticket
+                console.log('Calling API...');
+                const createdTicket = await TicketAPI.createTicket(ticketData);
+                console.log('API response:', createdTicket);
+
+                if (createdTicket) {
+                    console.log('Ticket created successfully!');
+                    UIManager.showAlert('Ticket created successfully!', 'success');
+                    
+                    // Reset form after 1 second
+                    setTimeout(() => {
+                        document.getElementById('ticketForm').reset();
+                        UIManager.prefillUserInfo();
+                        // Set default priority back to MEDIUM
+                        document.getElementById('priority').value = 'MEDIUM';
+                        
+                        // Optionally redirect to dashboard
+                        // window.location.href = '/employee/dashboard';
+                    }, 1500);
+                } else {
+                    console.error('Create ticket returned null/false');
+                    UIManager.showAlert('Failed to create ticket. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting ticket:', error);
+                console.error('Error details:', error.stack);
+                UIManager.showAlert(error.message || 'An error occurred. Please try again.', 'error');
+            } finally {
+                UIManager.setLoading(false);
+            }
+        }
+
+        // ========================================
+        // Sidebar Toggle
+        // ========================================
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+        
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+        
+        // Restore collapsed state
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+        }
+
+        // ========================================
+        // Logout Button
+        // ========================================
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                AuthManager.logout();
+            }
+        });
+
+        // ========================================
+        // Form Input Listeners
+        // ========================================
+        document.getElementById('title').addEventListener('input', () => {
+            UIManager.clearFieldError('title', 'titleError');
+        });
+
+        document.getElementById('category').addEventListener('change', () => {
+            UIManager.clearFieldError('category', 'categoryError');
+        });
+
+        // ========================================
+        // Page Initialization
+        // ========================================
+        (function initializePage() {
+            // Check authentication
+            if (!AuthManager.requireAuth()) {
+                return;
+            }
+
+            // Check if user is EMPLOYEE
+            if (!AuthManager.isEmployee()) {
+                alert('Access denied. This page is only for employees.');
+                window.location.href = '/login';
+                return;
+            }
+
+            // Update UI with user info
+            UIManager.updateUserGreeting();
+            UIManager.prefillUserInfo();
+
+            // Add form submit listener
+            document.getElementById('ticketForm').addEventListener('submit', handleFormSubmit);
+        })();
+    </script>
+</body>
+</html>

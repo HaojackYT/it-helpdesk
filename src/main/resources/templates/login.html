@@ -285,7 +285,7 @@
              * Save authentication data to localStorage
              */
             function saveAuthData(loginResponse) {
-                const { token, type, username, fullName, email, roles, permissions } = loginResponse;
+                const { token, type, username, fullName, email, roles, permissions, department } = loginResponse;
                 
                 // Save token
                 localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
@@ -296,6 +296,7 @@
                     username,
                     fullName,
                     email,
+                    department: department || '',
                     roles: Array.from(roles || []),
                     permissions: Array.from(permissions || [])
                 };

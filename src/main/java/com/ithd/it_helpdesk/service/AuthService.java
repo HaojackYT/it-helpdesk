@@ -51,6 +51,7 @@ public class AuthService {
                 .username(userDetails.getUsername())
                 .fullName(userDetails.getFullName())
                 .email(userDetails.getEmail())
+                .department(userDetails.getDepartment())
                 .roles(roles)
                 .permissions(permissions)
                 .build();
