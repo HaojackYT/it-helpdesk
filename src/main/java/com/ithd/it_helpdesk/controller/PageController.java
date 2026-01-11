@@ -50,4 +50,9 @@ public class PageController {
     public String employeeNewTicket() {
         return "employee/employee-newticket";
     }
+
+    @GetMapping("/employee/my-tickets")
+    public String employeeMyTickets() {
+        return "employee/employee-myticket";
+    }
 }

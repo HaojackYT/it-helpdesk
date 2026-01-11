@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Helpdesk - My Tickets</title>
+    
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/employee/employee-sidebar.css">
+    <link rel="stylesheet" href="/css/employee/employee-myticket.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Component -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">IT Helpdesk</h1>
+            <div class="header-actions">
+                <button class="btn-icon btn-user" aria-label="User profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+                <button class="btn-icon btn-logout" aria-label="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Component -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="/employee/dashboard" class="menu-link" title="Dashboard">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item">
+                    <a href="/employee/new-ticket" class="menu-link" title="New Ticket">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <span class="menu-text">New Ticket</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item active">
+                    <a href="/employee/my-tickets" class="menu-link" title="My Tickets">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span class="menu-text">My Tickets</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tickets-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2 class="page-title">My Tickets</h2>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="tickets-controls">
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" placeholder="Find ticket" id="searchInput">
+                    <button class="search-btn" aria-label="Search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="entries-control">
+                    <span class="entries-label">Show:</span>
+                    <select class="entries-select" id="entriesSelect">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="entries-label">Entries</span>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading tickets...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <p id="errorMessage">Failed to load tickets</p>
+                <button onclick="TicketsManager.fetchTickets()" class="retry-btn">Retry</button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <p class="empty-state-text">No tickets found</p>
+                <p class="empty-state-subtext">You haven't created any tickets yet</p>
+            </div>
+
+            <!-- Tickets Table -->
+            <div id="tableWrapper" class="table-wrapper">
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>TITLE</th>
+                            <th>DESCRIPTION</th>
+                            <th>CATEGORY</th>
+                            <th>PRIORITY</th>
+                            <th>CREATED AT</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div id="paginationWrapper" class="pagination-wrapper">
+                <div class="pagination-info" id="paginationInfo">
+                    Showing 1 to 5 of 5 entries
+                </div>
+                <div class="pagination-controls" id="paginationControls">
+                    <button class="pagination-btn" id="prevPage" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn" id="nextPage" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Authentication Module
+        const Auth = {
+            TOKEN_KEY: 'auth_token',
+            USER_KEY: 'user_info',
+            
+            getToken() {
+                return localStorage.getItem(this.TOKEN_KEY);
+            },
+            
+            setToken(token) {
+                localStorage.setItem(this.TOKEN_KEY, token);
+            },
+            
+            removeToken() {
+                localStorage.removeItem(this.TOKEN_KEY);
+                localStorage.removeItem(this.USER_KEY);
+            },
+            
+            getUserInfo() {
+                const userJson = localStorage.getItem(this.USER_KEY);
+                return userJson ? JSON.parse(userJson) : null;
+            },
+            
+            setUserInfo(userInfo) {
+                localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
+            },
+            
+            isAuthenticated() {
+                return !!this.getToken();
+            },
+            
+            hasPermission(permission) {
+                const user = this.getUserInfo();
+                return user && user.permissions && user.permissions.includes(permission);
+            },
+            
+            logout() {
+                this.removeToken();
+                window.location.href = '/login';
+            },
+            
+            requireAuth() {
+                if (!this.isAuthenticated()) {
+                    window.location.href = '/login';
+                    return false;
+                }
+                return true;
+            }
+        };
+
+        // API Module
+        const API = {
+            BASE_URL: '/api',
+            
+            getHeaders() {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                const token = Auth.getToken();
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                return headers;
+            },
+            
+            async handleResponse(response) {
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    Auth.logout();
+                    throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+                }
+                
+                if (response.status === 403) {
+                    throw new Error('Bạn không có quyền thực hiện thao tác này.');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Đã xảy ra lỗi');
+                }
+                
+                return data;
+            },
+            
+            async get(endpoint) {
+                const response = await fetch(`${this.BASE_URL}${endpoint}`, {
+                    method: 'GET',
+                    headers: this.getHeaders()
+                });
+                return await this.handleResponse(response);
+            },
+            
+            async getMyTickets() {
+                const response = await this.get('/tickets/my');
+                return response.data || [];
+            }
+        };
+
+        // Tickets Manager Module
+        const TicketsManager = {
+            tickets: [],
+            filteredTickets: [],
+            currentPage: 1,
+            entriesPerPage: 10,
+            isLoading: false,
+            
+            async init() {
+                // Kiểm tra đăng nhập
+                if (!Auth.requireAuth()) {
+                    return;
+                }
+                
+                // Kiểm tra quyền
+                if (!Auth.hasPermission('TICKET_VIEW_OWN')) {
+                    this.showError('Bạn không có quyền xem tickets');
+                    return;
+                }
+                
+                this.setupEventListeners();
+                await this.fetchTickets();
+            },
+            
+            setupEventListeners() {
+                // Search input với debounce
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    let searchTimeout;
+                    searchInput.addEventListener('input', (e) => {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(() => {
+                            this.filterTickets(e.target.value);
+                        }, 300);
+                    });
+                }
+                
+                // Entries per page selector
+                const entriesSelect = document.getElementById('entriesSelect');
+                if (entriesSelect) {
+                    entriesSelect.addEventListener('change', (e) => {
+                        this.entriesPerPage = parseInt(e.target.value);
+                        this.currentPage = 1;
+                        this.renderTickets();
+                    });
+                }
+                
+                // Logout button
+                const logoutBtn = document.querySelector('.btn-logout');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        Auth.logout();
+                    });
+                }
+            },
+            
+            async fetchTickets() {
+                if (this.isLoading) return;
+                
+                try {
+                    this.isLoading = true;
+                    this.showLoading();
+                    
+                    const tickets = await API.getMyTickets();
+                    this.tickets = tickets;
+                    this.filteredTickets = [...tickets];
+                    
+                    this.hideLoading();
+                    this.renderTickets();
+                } catch (error) {
+                    console.error('Error fetching tickets:', error);
+                    this.hideLoading();
+                    this.showError(error.message || 'Không thể tải danh sách tickets');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            
+            filterTickets(searchTerm) {
+                const term = searchTerm.toLowerCase().trim();
+                
+                if (!term) {
+                    this.filteredTickets = [...this.tickets];
+                } else {
+                    this.filteredTickets = this.tickets.filter(ticket => {
+                        const fields = [
+                            ticket.id,
+                            ticket.title,
+                            ticket.description,
+                            ticket.category,
+                            ticket.priority,
+                            ticket.status,
+                            ticket.createdBy?.fullName
+                        ];
+                        return fields.some(field => 
+                            field && field.toString().toLowerCase().includes(term)
+                        );
+                    });
+                }
+                
+                this.currentPage = 1;
+                this.renderTickets();
+            },
+            
+            renderTickets() {
+                const tbody = document.getElementById('ticketsTableBody');
+                const emptyState = document.getElementById('emptyState');
+                const tableWrapper = document.getElementById('tableWrapper');
+                const paginationWrapper = document.getElementById('paginationWrapper');
+                
+                if (!tbody) return;
+                
+                // Hiển thị empty state nếu không có tickets
+                if (this.filteredTickets.length === 0) {
+                    if (emptyState) emptyState.style.display = 'flex';
+                    if (tableWrapper) tableWrapper.style.display = 'none';
+                    if (paginationWrapper) paginationWrapper.style.display = 'none';
+                    return;
+                }
+                
+                // Ẩn empty state và hiển thị table
+                if (emptyState) emptyState.style.display = 'none';
+                if (tableWrapper) tableWrapper.style.display = 'block';
+                if (paginationWrapper) paginationWrapper.style.display = 'flex';
+                
+                // Tính toán pagination
+                const startIndex = (this.currentPage - 1) * this.entriesPerPage;
+                const endIndex = startIndex + this.entriesPerPage;
+                const paginatedTickets = this.filteredTickets.slice(startIndex, endIndex);
+                
+                // Render table rows với XSS prevention
+                tbody.innerHTML = paginatedTickets.map(ticket => {
+                    // XSS prevention - escape HTML
+                    const escapeHtml = (text) => {
+                        const div = document.createElement('div');
+                        div.textContent = text;
+                        return div.innerHTML;
+                    };
+                    
+                    const safeTitle = escapeHtml(ticket.title || '');
+                    const safeDescription = escapeHtml(ticket.description || '');
+                    const statusClass = this.getStatusClass(ticket.status);
+                    const statusText = this.formatStatus(ticket.status);
+                    const shortId = this.truncateId(ticket.id);
+                    const createdDate = this.formatDateTime(ticket.createdAt);
+                    
+                    return `
+                        <tr>
+                            <td class="td-id" title="${ticket.id}">${shortId}</td>
+                            <td class="td-title" title="${safeTitle}">${safeTitle}</td>
+                            <td class="td-description" title="${safeDescription}">${safeDescription || 'N/A'}</td>
+                            <td class="td-category">${ticket.category}</td>
+                            <td class="td-priority">${ticket.priority}</td>
+                            <td class="td-created">${createdDate}</td>
+                            <td>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn action-btn-view" 
+                                            onclick="TicketsManager.viewTicket('${ticket.id}')"
+                                            title="Xem chi tiết">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                    <button class="action-btn action-btn-edit" 
+                                            onclick="TicketsManager.editTicket('${ticket.id}')"
+                                            title="Chỉnh sửa">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                this.updatePagination();
+            },
+            
+            updatePagination() {
+                const totalPages = Math.ceil(this.filteredTickets.length / this.entriesPerPage);
+                const startEntry = this.filteredTickets.length === 0 ? 0 : (this.currentPage - 1) * this.entriesPerPage + 1;
+                const endEntry = Math.min(this.currentPage * this.entriesPerPage, this.filteredTickets.length);
+                
+                // Update pagination info
+                const paginationInfo = document.getElementById('paginationInfo');
+                if (paginationInfo) {
+                    paginationInfo.textContent = `Showing ${startEntry} to ${endEntry} of ${this.filteredTickets.length} entries`;
+                }
+                
+                // Update pagination buttons
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                
+                if (prevBtn) {
+                    prevBtn.disabled = this.currentPage === 1;
+                    prevBtn.onclick = () => {
+                        if (this.currentPage > 1) {
+                            this.currentPage--;
+                            this.renderTickets();
+                        }
+                    };
+                }
+                
+                if (nextBtn) {
+                    nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
+                    nextBtn.onclick = () => {
+                        if (this.currentPage < totalPages) {
+                            this.currentPage++;
+                            this.renderTickets();
+                        }
+                    };
+                }
+            },
+            
+            showLoading() {
+                const loadingState = document.getElementById('loadingState');
+                const tableWrapper = document.getElementById('tableWrapper');
+                const paginationWrapper = document.getElementById('paginationWrapper');
+                const emptyState = document.getElementById('emptyState');
+                const errorState = document.getElementById('errorState');
+                
+                if (loadingState) loadingState.style.display = 'flex';
+                if (tableWrapper) tableWrapper.style.display = 'none';
+                if (paginationWrapper) paginationWrapper.style.display = 'none';
+                if (emptyState) emptyState.style.display = 'none';
+                if (errorState) errorState.style.display = 'none';
+            },
+            
+            hideLoading() {
+                const loadingState = document.getElementById('loadingState');
+                if (loadingState) {
+                    loadingState.style.display = 'none';
+                }
+            },
+            
+            showError(message) {
+                const errorState = document.getElementById('errorState');
+                const errorMessage = document.getElementById('errorMessage');
+                const tableWrapper = document.getElementById('tableWrapper');
+                const paginationWrapper = document.getElementById('paginationWrapper');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (errorMessage) errorMessage.textContent = message;
+                if (errorState) errorState.style.display = 'flex';
+                if (tableWrapper) tableWrapper.style.display = 'none';
+                if (paginationWrapper) paginationWrapper.style.display = 'none';
+                if (emptyState) emptyState.style.display = 'none';
+            },
+            
+            getStatusClass(status) {
+                const statusMap = {
+                    'OPEN': 'status-open',
+                    'ASSIGNED': 'status-assigned',
+                    'IN_PROGRESS': 'status-progress',
+                    'RESOLVED': 'status-resolved',
+                    'CLOSED': 'status-closed'
+                };
+                return statusMap[status] || 'status-open';
+            },
+            
+            formatStatus(status) {
+                const statusMap = {
+                    'OPEN': 'Open',
+                    'ASSIGNED': 'Assigned',
+                    'IN_PROGRESS': 'In Progress',
+                    'RESOLVED': 'Resolved',
+                    'CLOSED': 'Closed'
+                };
+                return statusMap[status] || status;
+            },
+            
+            formatDateTime(dateString) {
+                if (!dateString) return 'N/A';
+                
+                try {
+                    const date = new Date(dateString);
+                    const time = date.toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    const dateStr = date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    return `${time} ${dateStr}`;
+                } catch (error) {
+                    return 'Invalid date';
+                }
+            },
+            
+            truncateId(uuid) {
+                return uuid ? uuid.substring(0, 8) : 'N/A';
+            },
+            
+            viewTicket(ticketId) {
+                // Redirect to ticket detail page
+                window.location.href = `/tickets/${ticketId}`;
+            },
+            
+            editTicket(ticketId) {
+                // Redirect to edit ticket page
+                window.location.href = `/employee/edit-ticket/${ticketId}`;
+            }
+        };
+
+        // Sidebar Toggle
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+        const mainContent = document.querySelector('.main-content');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Restore sidebar state
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed && sidebar && mainContent) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
+            
+            // Initialize tickets manager
+            TicketsManager.init();
+        });
+    </script>
+</body>
+</html>
