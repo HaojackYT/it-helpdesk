@@ -111,6 +111,10 @@ public class TicketService {
                 .id(ticket.getCreatedBy().getId())
                 .username(ticket.getCreatedBy().getUsername())
                 .fullName(ticket.getCreatedBy().getFullName())
+                .department(ticket.getCreatedBy().getDepartment())
+                .roles(ticket.getCreatedBy().getRoles().stream()
+                        .map(role -> role.getName().name())
+                        .collect(Collectors.toList()))
                 .build();
 
         TicketResponse.UserSummary assignedTo = null;
@@ -119,6 +123,10 @@ public class TicketService {
                     .id(ticket.getAssignedTo().getId())
                     .username(ticket.getAssignedTo().getUsername())
                     .fullName(ticket.getAssignedTo().getFullName())
+                    .department(ticket.getAssignedTo().getDepartment())
+                    .roles(ticket.getAssignedTo().getRoles().stream()
+                            .map(role -> role.getName().name())
+                            .collect(Collectors.toList()))
                     .build();
         }
 
@@ -131,6 +139,10 @@ public class TicketService {
                                     .id(comment.getUser().getId())
                                     .username(comment.getUser().getUsername())
                                     .fullName(comment.getUser().getFullName())
+                                    .department(comment.getUser().getDepartment())
+                                    .roles(comment.getUser().getRoles().stream()
+                                            .map(role -> role.getName().name())
+                                            .collect(Collectors.toList()))
                                     .build())
                             .createdAt(comment.getCreatedAt())
                             .build())

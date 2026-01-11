@@ -36,6 +36,8 @@ public class TicketResponse {
         private UUID id;
         private String username;
         private String fullName;
+        private String department;
+        private List<String> roles;
     }
     
     @Data
