@@ -2,6 +2,7 @@ package com.ithd.it_helpdesk.service;
 
 import com.ithd.it_helpdesk.dto.request.AssignRoleRequest;
 import com.ithd.it_helpdesk.dto.request.CreateUserRequest;
+import com.ithd.it_helpdesk.dto.request.UpdateProfileRequest;
 import com.ithd.it_helpdesk.dto.request.UpdateUserRequest;
 import com.ithd.it_helpdesk.dto.response.UserResponse;
 import com.ithd.it_helpdesk.entity.Role;
@@ -116,6 +117,30 @@ public class UserService {
         }
         if (request.getStatus() != null) {
             user.setStatus(request.getStatus());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return mapToUserResponse(updatedUser);
+    }
+
+    @Transactional
+    public UserResponse updateProfile(UUID id, UpdateProfileRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            // verify current password provided
+            if (request.getCurrentPassword() == null || request.getCurrentPassword().isEmpty()) {
+                throw new org.springframework.security.authentication.BadCredentialsException("Current password required");
+            }
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new org.springframework.security.authentication.BadCredentialsException("Current password is incorrect");
+            }
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        if (request.getFullName() != null) {
+            user.setFullName(request.getFullName());
         }
 
         User updatedUser = userRepository.save(user);
