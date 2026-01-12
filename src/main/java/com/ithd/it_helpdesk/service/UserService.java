@@ -41,6 +41,28 @@ public class UserService {
         return mapToUserResponse(user);
     }
 
+    /**
+     * Count users by role name. If roleName is null or empty, returns total users.
+     */
+    public long countByRole(String roleName) {
+        if (roleName == null || roleName.isBlank()) {
+            return userRepository.count();
+        }
+
+        // Accept either ROLE_EMPLOYEE or EMPLOYEE
+        String normalized = roleName.trim().toUpperCase();
+        if (!normalized.startsWith("ROLE_")) {
+            normalized = "ROLE_" + normalized;
+        }
+
+        try {
+            com.ithd.it_helpdesk.entity.Role.RoleName roleEnum = com.ithd.it_helpdesk.entity.Role.RoleName.valueOf(normalized);
+            return userRepository.countByRoleName(roleEnum);
+        } catch (IllegalArgumentException ex) {
+            return 0L;
+        }
+    }
+
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
         // Check if username already exists
