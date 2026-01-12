@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.ithd.it_helpdesk.security.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,6 +28,12 @@ public class UserController {
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(ApiResponse.success(users));
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<ApiResponse<Long>> countUsersByRole(@RequestParam(required = false) String role) {
+        long count = userService.countByRole(role);
+        return ResponseEntity.ok(ApiResponse.success(count));
     }
 
     @GetMapping("/{id}")
@@ -61,5 +69,20 @@ public class UserController {
             @Valid @RequestBody AssignRoleRequest request) {
         UserResponse user = userService.assignRoles(id, request);
         return ResponseEntity.ok(ApiResponse.success("Roles assigned successfully", user));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+                : null;
+
+        if (principal instanceof CustomUserDetails) {
+            CustomUserDetails cud = (CustomUserDetails) principal;
+            UserResponse user = userService.getUserById(cud.getId());
+            return ResponseEntity.ok(ApiResponse.success(user));
+        }
+
+        return ResponseEntity.status(401).body(ApiResponse.error("Unauthenticated"));
     }
 }

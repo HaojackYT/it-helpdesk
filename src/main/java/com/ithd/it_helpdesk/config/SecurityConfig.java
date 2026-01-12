@@ -65,6 +65,8 @@ public class SecurityConfig {
                 .requestMatchers("/dashboard").permitAll()
                 
                 // User Management - requires specific permissions
+                    .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/users/count").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority("USER_VIEW")
                 .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
                 .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAuthority("USER_UPDATE")
