@@ -225,6 +225,23 @@
                 }
             }
 
+            // Fetch employee count from a lightweight endpoint (does not require USER_VIEW permission)
+            async function fetchEmployeeCount() {
+                const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.USERS}/count?role=EMPLOYEE`;
+                try {
+                    const response = await fetch(url, { headers: getAuthHeaders() });
+                    if (!response.ok) throw new Error('Failed to fetch employee count');
+                    const result = await response.json();
+                    // ApiResponse.success wraps the value in .data
+                    if (result && (typeof result === 'number')) return result;
+                    if (result && result.success && (typeof result.data === 'number')) return result.data;
+                    return 0;
+                } catch (err) {
+                    console.warn('Unable to fetch employee count:', err);
+                    return 0;
+                }
+            }
+
             function generateMockData() {
                 const statuses = ['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
                 
@@ -298,16 +315,15 @@
                 try {
                     if (elements.loadingOverlay) elements.loadingOverlay.style.display = 'flex';
 
-                    const [tickets, users] = await Promise.all([
+                    const [tickets, employeeCount] = await Promise.all([
                         fetchTickets(),
-                        fetchUsers()
+                        fetchEmployeeCount()
                     ]);
 
                     const stats = calculateStatistics(tickets);
                     updateStatistics(stats);
 
-                    const employeeCount = countEmployees(users);
-                    updateStatValue(elements.totalEmployees, employeeCount);
+                    updateStatValue(elements.totalEmployees, employeeCount || 0);
 
                     updateLastUpdatedTime();
                 } catch (error) {
