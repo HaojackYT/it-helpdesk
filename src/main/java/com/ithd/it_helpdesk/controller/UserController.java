@@ -85,4 +85,19 @@ public class UserController {
 
         return ResponseEntity.status(401).body(ApiResponse.error("Unauthenticated"));
     }
+
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> updateCurrentUser(@Valid @RequestBody com.ithd.it_helpdesk.dto.request.UpdateProfileRequest request) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+                : null;
+
+        if (principal instanceof CustomUserDetails) {
+            CustomUserDetails cud = (CustomUserDetails) principal;
+            UserResponse user = userService.updateProfile(cud.getId(), request);
+            return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", user));
+        }
+
+        return ResponseEntity.status(401).body(ApiResponse.error("Unauthenticated"));
+    }
 }
