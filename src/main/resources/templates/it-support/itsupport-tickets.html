@@ -212,24 +212,6 @@
                 </div>
 
                 <div class="modal-right">
-                    <!-- Assign Panel -->
-                    <div id="assignPanel" class="panel assign-panel" style="display:none;">
-                        <h4>Assign Ticket</h4>
-                        <div class="close-row">
-                            <label>Team</label>
-                            <div class="team-controls">
-                                <select id="closeTeamSelect"></select>
-                                <button id="reloadTeamsBtn" class="icon-btn" title="Reload teams" aria-label="Reload teams">⟳</button>
-                            </div>
-                        </div>
-                        <div class="close-row">
-                            <label>Team Member</label>
-                            <select id="closeMemberSelect"></select>
-                        </div>
-                        <div class="close-row actions">
-                            <button class="btn-assign" onclick="TicketsManager.assignTicketWithForm()">Assign</button>
-                        </div>
-                    </div>
 
                     <!-- Close Panel -->
                     <div id="closePanel" class="panel close-panel" style="display:none;">
@@ -381,15 +363,20 @@
             hideError() { document.getElementById('errorState').style.display = 'none'; },
             viewTicket(id) { /* Show details when clicking view */ this.showMoreInfo(id); },
             async assignTicket(id) {
-                // open modal and populate team/member selects (show assign panel)
-                this.showMoreInfo(id, 'assign');
-                // small delay so modal values are populated
-                await new Promise(r => setTimeout(r, 150));
-                // focus member select
-                const memberSelect = document.getElementById('closeMemberSelect');
-                if (memberSelect) memberSelect.focus();
-                // store current assign id
+                console.log('TicketsManager.assignTicket called', id);
+                // open assign modal (separate from ticket details)
                 this._assigningId = id;
+                // show ticket title in modal if available
+                const ticket = this.state.tickets.find(t => t.id === id);
+                const titleEl = document.getElementById('assignTicketTitle');
+                if (titleEl) titleEl.textContent = ticket ? (ticket.title || ticket.id) : id;
+                // ensure we have up-to-date IT support users
+                await this.fetchITSupportUsers();
+                this.populateAssignSelect();
+                const modal = document.getElementById('assignModal');
+                if (modal) modal.style.display = 'flex';
+                const select = document.getElementById('assignUserSelect');
+                if (select) select.focus();
             },
             async assignTicketWithForm() {
                 const id = this._assigningId || this._currentDetailId;
@@ -456,6 +443,7 @@
                 } finally { if (selectEl) selectEl.disabled = false; }
             },
             async showMoreInfo(id, panel = null) {
+                console.log('TicketsManager.showMoreInfo called', id, panel);
                 const ticket = this.state.tickets.find(t => t.id === id);
                 if (!ticket) return;
 
@@ -480,26 +468,26 @@
                 const commentEl = document.getElementById('closeComment');
                 if (commentEl) commentEl.value = '';
 
-                // load users/teams and populate selects
-                await this.fetchUsersForTeams();
-                const preferredDept = ticket.assignedTo?.department || ticket.createdBy?.department || '';
-                this.populateTeamSelect(preferredDept);
-                // set selected member if present
-                const memberSelect = document.getElementById('closeMemberSelect');
-                if (memberSelect && ticket.assignedTo && ticket.assignedTo.id) {
-                    memberSelect.value = ticket.assignedTo.id;
+                // If closing panel requested, load teams/users and populate selects
+                if (panel === 'close') {
+                    await this.fetchUsersForTeams();
+                    const preferredDept = ticket.assignedTo?.department || ticket.createdBy?.department || '';
+                    this.populateTeamSelect(preferredDept);
+                    const memberSelect = document.getElementById('closeMemberSelect');
+                    if (memberSelect && ticket.assignedTo && ticket.assignedTo.id) {
+                        memberSelect.value = ticket.assignedTo.id;
+                    }
                 }
 
-                // show/hide panels based on requested action
-                const assignPanel = document.getElementById('assignPanel');
+                // show/hide panels based on requested action (assign handled by separate modal)
                 const closePanel = document.getElementById('closePanel');
-                if (assignPanel) assignPanel.style.display = (panel === 'assign') ? 'block' : 'none';
                 if (closePanel) closePanel.style.display = (panel === 'close') ? 'block' : 'none';
                 const modalRight = document.querySelector('.modal-right');
-                if (modalRight) modalRight.style.display = (panel === 'assign' || panel === 'close') ? 'block' : 'none';
+                if (modalRight) modalRight.style.display = (panel === 'close') ? 'block' : 'none';
 
                 // show modal
-                document.getElementById('ticketDetailsModal').style.display = 'flex';
+                const detailsModal = document.getElementById('ticketDetailsModal');
+                if (detailsModal) detailsModal.style.display = 'flex';
             },
             closeTicketModal() {
                 document.getElementById('ticketDetailsModal').style.display = 'none';
@@ -544,6 +532,97 @@
                     this._teamsMap = {};
                     return [];
                 }
+            },
+
+            // --- Assign helpers (standalone modal) ---
+            async fetchITSupportUsers(force = false) {
+                if (this._itSupportUsers && !force) return this._itSupportUsers;
+                // Ensure we have latest user list when opening assign modal
+                await this.fetchUsersForTeams(true);
+                const all = this._allUsers || [];
+                const users = all.filter(u => {
+                    // Only include active users by default
+                    const status = (u.status || '').toString().toUpperCase();
+                    if (status && status !== 'ACTIVE') return false;
+                    const username = (u.username || '').toString().toLowerCase();
+                    const fullName = (u.fullName || u.full_name || '').toString().toUpperCase();
+                    const dept = (u.department || '').toString().toUpperCase();
+                    const roles = u.roles || u.role || [];
+                    const roleArr = Array.isArray(roles) ? roles : [roles];
+                    const roleMatch = roleArr.some(r => {
+                        try { return String(r).toUpperCase().includes('IT_SUPPORT') || String(r).toUpperCase().includes('ROLE_IT') || String(r).toUpperCase().includes('IT'); } catch { return false; }
+                    });
+                    const deptMatch = dept.includes('IT') || dept.includes('SUPPORT') || fullName.includes('IT SUPPORT');
+                    const usernameMatch = username.startsWith('itsupport') || username.includes('itsupport') || fullName.includes('ITSUPPORT');
+                    return roleMatch || deptMatch || usernameMatch;
+                });
+                console.log('fetchITSupportUsers -> found', users.length, users.map(u => u.username || u.id));
+                this._itSupportUsers = users;
+                return users;
+            },
+
+            populateAssignSelect() {
+                const select = document.getElementById('assignUserSelect');
+                const submitBtn = document.getElementById('assignSubmitBtn');
+                if (!select) return;
+                select.innerHTML = '';
+                const users = this._itSupportUsers || [];
+                if (users.length === 0) {
+                    select.innerHTML = '<option value="">No IT support users</option>';
+                    if (submitBtn) submitBtn.disabled = true;
+                    return;
+                }
+                users.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = u.fullName || u.username || u.email || 'Unknown';
+                    select.appendChild(opt);
+                });
+                // default to first user and focus
+                if (users.length > 0) {
+                    select.value = users[0].id;
+                    select.selectedIndex = 0;
+                    select.focus();
+                }
+                if (submitBtn) submitBtn.disabled = false;
+            },
+
+            async submitAssign() {
+                const id = this._assigningId;
+                if (!id) return alert('No ticket selected to assign');
+                const assigneeId = document.getElementById('assignUserSelect')?.value;
+                if (!assigneeId) return alert('Please select a user to assign');
+                if (!confirm('Bạn có chắc chắn muốn gán ticket này cho thành viên đã chọn?')) return;
+                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
+                try {
+                    const res = await fetch(`${this.API_BASE_URL}/${id}/assign`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                        body: JSON.stringify({ assigneeId })
+                    });
+                    if (res.status === 401) { AuthManager.logout(); return; }
+                    if (res.status === 403) { throw new Error('Bạn không có quyền gán ticket'); }
+                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Assign failed'); }
+                    const body = await res.json(); const updated = body && body.data ? body.data : body;
+                    const ticket = this.state.tickets.find(t => t.id === id);
+                    if (ticket) {
+                        ticket.assignedTo = updated.assignedTo || ticket.assignedTo;
+                        ticket.status = updated.status || ticket.status;
+                    }
+                    await this.fetchTickets();
+                    alert('Ticket assigned successfully');
+                    this.closeAssignModal();
+                    this._assigningId = null;
+                } catch (err) {
+                    console.error('Assign failed:', err);
+                    alert('Assign failed: ' + (err.message || err));
+                }
+            },
+
+            closeAssignModal() {
+                const modal = document.getElementById('assignModal');
+                if (modal) modal.style.display = 'none';
+                this._assigningId = null;
             },
 
             populateTeamSelect(selectedDept) {
@@ -593,8 +672,8 @@
                 // Quick close: show modal, set a quick comment and execute close flow
                 try {
                     this.showMoreInfo(id, 'close');
-                    // small delay so modal values are populated
-                    await new Promise(r => setTimeout(r, 150));
+                    // give the modal a bit more time to render so user can see it
+                    await new Promise(r => setTimeout(r, 350));
                     const commentEl = document.getElementById('closeComment');
                     if (commentEl) commentEl.value = 'Closed quickly by IT Support';
                     await this.closeTicketWithForm();
@@ -655,7 +734,27 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => { TicketsManager.init(); });
+        // Expose TicketsManager to the global scope so inline handlers work reliably
+        window.TicketsManager = null;
+        document.addEventListener('DOMContentLoaded', () => { TicketsManager.init(); window.TicketsManager = TicketsManager; });
     </script>
+
+    <!-- Assign Modal (standalone) -->
+    <div id="assignModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h3 class="modal-title">Assign Ticket: <span id="assignTicketTitle"></span></h3>
+            <button class="modal-close" aria-label="Close" onclick="TicketsManager.closeAssignModal()">×</button>
+            <div class="modal-body">
+                <div class="assign-row">
+                    <label for="assignUserSelect">Assign to</label>
+                    <select id="assignUserSelect" style="width:100%; padding:6px 8px; margin-top:6px;"></select>
+                </div>
+                <div class="modal-actions" style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+                    <button id="assignSubmitBtn" class="btn-primary" onclick="TicketsManager.submitAssign()" disabled>Assign</button>
+                    <button class="btn-secondary" onclick="TicketsManager.closeAssignModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

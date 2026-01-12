@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/header.css}"> 
     <link rel="stylesheet" th:href="@{/css/it-support/itsupport-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/it-support/itsupport-dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/component/user-profile.css}">
 <body>
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -153,6 +154,9 @@
             </button>
         </div>
     </main>
+
+    <!-- Insert user profile modal component -->
+    <div th:insert="component/user-profile :: userProfile"></div>
 
     <script>
         (function() {
@@ -345,6 +349,12 @@
 
             function initHeaderButtons() {
                 document.querySelector('.btn-user')?.addEventListener('click', () => {
+                    // prefer the modal component if available
+                    if (typeof showUserProfileModal === 'function') {
+                        showUserProfileModal();
+                        return;
+                    }
+
                     const user = JSON.parse(localStorage.getItem('user_info') || '{}');
                     alert(`User Profile\n\nUsername: ${user.username || 'N/A'}\nFull Name: ${user.fullName || 'N/A'}\nEmail: ${user.email || 'N/A'}`);
                 });
