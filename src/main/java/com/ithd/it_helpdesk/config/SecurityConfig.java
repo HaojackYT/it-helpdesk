@@ -66,6 +66,8 @@ public class SecurityConfig {
                 
                 // User Management - requires specific permissions
                     .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                    // Allow authenticated users to update their own profile without USER_UPDATE authority
+                    .requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/users/count").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority("USER_VIEW")
                 .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
