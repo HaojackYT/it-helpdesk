@@ -87,14 +87,14 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> updateCurrentUser(@Valid @RequestBody com.ithd.it_helpdesk.dto.request.UpdateProfileRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateCurrentUser(@Valid @RequestBody UpdateUserRequest request) {
         Object principal = SecurityContextHolder.getContext().getAuthentication() != null
                 ? SecurityContextHolder.getContext().getAuthentication().getPrincipal()
                 : null;
 
         if (principal instanceof CustomUserDetails) {
             CustomUserDetails cud = (CustomUserDetails) principal;
-            UserResponse user = userService.updateProfile(cud.getId(), request);
+            UserResponse user = userService.updateUser(cud.getId(), request);
             return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", user));
         }
 
