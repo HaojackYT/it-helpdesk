@@ -27,6 +27,7 @@
 
     <script>
         // Expose a global function to show the profile modal and populate data
+        var _currentProfile = null;
         function showUserProfileModal(user) {
             try {
                 const modal = document.getElementById('userProfileModal');
@@ -109,7 +110,187 @@
             closeBtn?.addEventListener('click', () => { modal.style.display = 'none'; });
 
             const editBtn = modal.querySelector('.user-profile-edit');
-            editBtn?.addEventListener('click', () => { alert('Edit profile - feature not implemented'); });
+            editBtn?.addEventListener('click', async () => {
+                try {
+                    const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
+                    const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
+                    const headers = { 'Accept': 'application/json' };
+                    if (token) headers['Authorization'] = `${tokenType} ${token}`;
+
+                    const resp = await fetch('/api/users/me', { headers });
+                    if (!resp.ok) throw new Error('Failed to fetch profile');
+                    const body = await resp.json();
+                    const serverUser = (body && body.success && body.data) ? body.data : body;
+                    _currentProfile = serverUser;
+                    openInlineEditModal(serverUser);
+                } catch (err) {
+                    console.error('Could not open edit modal', err);
+                    alert('Không thể mở chỉnh sửa hồ sơ. Vui lòng thử lại.');
+                }
+            });
+        })();
+        
+        // Inline edit modal (built into this fragment)
+        (function() {
+            const modalHtml = `
+                <div class="modal-overlay" id="inlineEditUserModal" style="display:none;">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div class="edit-avatar">
+                                    <img id="ieAvatarPreview" src="" alt="avatar" />
+                                    <label class="upload-label">Upload Image<input id="ieAvatarFile" type="file" accept="image/*"/></label>
+                                </div>
+                                <h3>Edit User Profile</h3>
+                            </div>
+                            <button class="modal-close" aria-label="Close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="inlineEditUserForm">
+                                <div class="form-row"><label>Username</label><input id="ieUsername" type="text" readonly/></div>
+                                <div class="form-row"><label>Full name</label><input id="ieFullName" type="text" autocomplete="name" readonly/></div>
+                                <div class="form-row"><label>Current password</label><input id="ieCurrentPassword" type="password" autocomplete="current-password"/></div>
+                                <div class="form-row"><label>New password</label><input id="ieNewPassword" type="password" autocomplete="new-password"/></div>
+                                <div class="form-row"><label>Confirm new password</label><input id="ieConfirmPassword" type="password" autocomplete="new-password"/></div>
+                                <div class="form-row"><label>Email</label><input id="ieEmail" type="email" readonly/></div>
+                                <div class="form-row"><label>Roles</label><input id="ieRoles" type="text" readonly/></div>
+                                <div class="form-row"><label>Status</label><input id="ieStatus" type="text" readonly value="ACTIVE"/></div>
+                                <div class="form-row"><label>Department</label><input id="ieDepartment" type="text" readonly/></div>
+                                <div class="form-row"><label>Created at</label><input id="ieCreatedAt" type="text" readonly/></div>
+                                <div style="text-align:right; margin-top:12px;"><button type="submit">Save</button></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>`;
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = modalHtml;
+            document.getElementById('userProfileModal').appendChild(wrapper);
+
+            const ieModal = document.getElementById('inlineEditUserModal');
+            const ieClose = ieModal.querySelector('.modal-close');
+            const ieForm = document.getElementById('inlineEditUserForm');
+
+            ieClose.addEventListener('click', () => { ieModal.style.display = 'none'; });
+            ieModal.addEventListener('click', (e) => { if (e.target === ieModal) ieModal.style.display = 'none'; });
+
+            window.openInlineEditModal = function(user) {
+                if (!user) return;
+                document.getElementById('ieUsername').value = user.username || '';
+                document.getElementById('ieFullName').value = user.fullName || user.fullname || '';
+                document.getElementById('ieCurrentPassword').value = '';
+                document.getElementById('ieNewPassword').value = '';
+                document.getElementById('ieConfirmPassword').value = '';
+                document.getElementById('ieEmail').value = user.email || '';
+                document.getElementById('ieRoles').value = (user.roles && Array.isArray(user.roles)) ?
+                    user.roles.map(r => r.toString().replace(/^ROLE_/, '').replace(/_/g, ' ').toUpperCase()).join(', ') : (user.roles || '');
+                document.getElementById('ieStatus').value = user.status || 'ACTIVE';
+                document.getElementById('ieDepartment').value = user.department || '';
+                document.getElementById('ieCreatedAt').value = user.createdAt || user.created_at || '';
+                // avatar preview (if available)
+                const avatarPreview = document.getElementById('ieAvatarPreview');
+                if (user.avatarUrl) {
+                    avatarPreview.src = user.avatarUrl;
+                } else {
+                    avatarPreview.src = '';
+                }
+                ieModal.style.display = 'flex';
+            }
+
+            ieForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    if (!_currentProfile || !_currentProfile.id) {
+                        alert('User id missing');
+                        return;
+                    }
+
+
+                    // Build payload: only allow changing password (fullName is locked)
+                    const currentPwd = document.getElementById('ieCurrentPassword').value || '';
+                    const newPwd = document.getElementById('ieNewPassword').value || '';
+                    const confirmPwd = document.getElementById('ieConfirmPassword').value || '';
+
+                    // Validation: if user wants to change password, require current and match confirm
+                    if (newPwd) {
+                        if (!currentPwd) {
+                            alert('Vui lòng nhập mật khẩu hiện tại để đổi mật khẩu');
+                            return;
+                        }
+                        if (newPwd.length < 6) {
+                            alert('Mật khẩu mới phải có ít nhất 6 ký tự');
+                            return;
+                        }
+                        if (newPwd !== confirmPwd) {
+                            alert('Mật khẩu mới và xác nhận không khớp');
+                            return;
+                        }
+                    }
+
+                    const payload = {};
+                    if (newPwd) payload.password = newPwd;
+                    const avatarFile = document.getElementById('ieAvatarFile')?.files[0];
+
+                    const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
+                    const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
+                    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+                    if (token) headers['Authorization'] = `${tokenType} ${token}`;
+
+                    // Use /api/users/me so authenticated user can update own profile
+                    const resp = await fetch(`/api/users/me`, {
+                        method: 'PUT', headers, body: JSON.stringify({
+                            ...payload,
+                            currentPassword: currentPwd || undefined
+                        })
+                    });
+
+                    const respBody = await resp.json().catch(()=>null);
+                    if (!resp.ok) {
+                        const err = (respBody && respBody.message) ? respBody.message : 'Cập nhật thất bại';
+                        console.error('Update failed', resp.status, respBody);
+                        alert(err);
+                        return;
+                    }
+
+                    const updated = (respBody && respBody.success && respBody.data) ? respBody.data : respBody;
+                    if (updated) {
+                        document.getElementById('profileFullName').textContent = updated.fullName || document.getElementById('profileFullName').textContent;
+                        document.getElementById('profileEmail').textContent = updated.email || document.getElementById('profileEmail').textContent;
+                        document.getElementById('profileDepartment').textContent = updated.department || document.getElementById('profileDepartment').textContent;
+                        document.getElementById('profileStatus').textContent = updated.status || document.getElementById('profileStatus').textContent;
+                    }
+
+                    // If avatar selected, attempt upload to /api/users/{id}/avatar (best-effort)
+                    if (avatarFile) {
+                        try {
+                            const fd = new FormData();
+                            fd.append('file', avatarFile);
+                            const authHeaders = {};
+                            if (token) authHeaders['Authorization'] = `${tokenType} ${token}`;
+                            const upResp = await fetch(`/api/users/${_currentProfile.id}/avatar`, {
+                                method: 'POST', headers: authHeaders, body: fd
+                            });
+                            if (!upResp.ok) {
+                                console.warn('Avatar upload failed', upResp.status);
+                            } else {
+                                const upBody = await upResp.json().catch(()=>null);
+                                if (upBody && upBody.url) {
+                                    document.getElementById('ieAvatarPreview').src = upBody.url;
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('Error uploading avatar', e);
+                        }
+                    }
+
+                    ieModal.style.display = 'none';
+                    alert('Cập nhật hồ sơ thành công');
+                } catch (err) {
+                    console.error('Error updating profile', err);
+                    const msg = (err && err.message) ? err.message : 'Có lỗi xảy ra';
+                    alert(msg);
+                }
+            });
         })();
     </script>
 </div>
