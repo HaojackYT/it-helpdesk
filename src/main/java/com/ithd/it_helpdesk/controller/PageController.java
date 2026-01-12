@@ -2,6 +2,9 @@ package com.ithd.it_helpdesk.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.ithd.it_helpdesk.security.CustomUserDetails;
 
 @Controller
 public class PageController {
@@ -32,7 +35,23 @@ public class PageController {
     }
     
     @GetMapping("/support/dashboard")
-    public String supportDashboard() {
+    public String supportDashboard(Model model) {
+        String displayName = "User";
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication() != null
+                    ? SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+                    : null;
+
+            if (principal instanceof CustomUserDetails) {
+                CustomUserDetails user = (CustomUserDetails) principal;
+                displayName = user.getFullName() != null && !user.getFullName().isBlank()
+                        ? user.getFullName()
+                        : user.getUsername();
+            }
+        } catch (Exception ignored) {
+        }
+
+        model.addAttribute("currentUserFullName", displayName);
         return "it-support/itsupport-dashboard";
     }
 
