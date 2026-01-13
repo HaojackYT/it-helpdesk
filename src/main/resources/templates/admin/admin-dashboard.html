@@ -86,17 +86,6 @@
                         <span class="menu-text">Users</span>
                     </a>
                 </li>
-                
-                <li class="menu-item">
-                    <a href="/admin/reports" class="menu-link" title="Reports">
-                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                        <span class="menu-text">Reports</span>
-                    </a>
-                </li>
             </ul>
         </nav>
     </aside>
@@ -104,589 +93,478 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="dashboard-container">
-            <h2 class="dashboard-title">Admin Dashboard</h2>
+            <h2 class="dashboard-title">Dashboard</h2>
             
-            <!-- Statistics Cards Grid -->
-            <div class="stats-grid">
+            <!-- Ticket & User Section -->
+            <div class="section-header">
+                <span class="section-badge">Ticket & User</span>
+            </div>
+            <div class="stats-row">
                 <!-- Total Tickets -->
-                <div class="stat-card stat-card-primary">
+                <div class="stat-card stat-card-blue">
                     <div class="stat-header">Total Tickets</div>
-                    <div class="stat-value" id="totalTickets">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                    <div class="stat-value" id="totalTickets">0</div>
                 </div>
 
-                <!-- Total Open -->
-                <div class="stat-card stat-card-secondary">
+                <!-- Open -->
+                <div class="stat-card stat-card-gray">
                     <div class="stat-header">Open</div>
-                    <div class="stat-value" id="totalOpen">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                    <div class="stat-value" id="totalOpen">0</div>
                 </div>
 
-                <!-- Total Assigned -->
-                <div class="stat-card stat-card-warning">
+                <!-- Assigned -->
+                <div class="stat-card stat-card-orange">
                     <div class="stat-header">Assigned</div>
-                    <div class="stat-value" id="totalAssigned">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                    <div class="stat-value" id="totalAssigned">0</div>
                 </div>
 
-                <!-- Total In Progress -->
+                <!-- In Progress -->
                 <div class="stat-card stat-card-yellow">
                     <div class="stat-header">In Progress</div>
-                    <div class="stat-value" id="totalInProgress">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                    <div class="stat-value" id="totalInProgress">0</div>
                 </div>
 
-                <!-- Total Resolved -->
-                <div class="stat-card stat-card-success">
+                <!-- Resolved -->
+                <div class="stat-card stat-card-green">
                     <div class="stat-header">Resolved</div>
-                    <div class="stat-value" id="totalResolved">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                    <div class="stat-value" id="totalResolved">0</div>
                 </div>
+            </div>
 
-                <!-- Total Closed -->
-                <div class="stat-card stat-card-danger">
+            <!-- Second Row -->
+            <div class="stats-row stats-row-secondary">
+                <!-- Closed -->
+                <div class="stat-card stat-card-red">
                     <div class="stat-header">Closed</div>
-                    <div class="stat-value" id="totalClosed">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                    <div class="stat-value" id="totalClosed">0</div>
                 </div>
 
-                <!-- Employee Count -->
-                <div class="stat-card stat-card-info">
-                    <div class="stat-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
-                    </div>
-                    <div class="stat-value" id="totalEmployee">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                <!-- Employees -->
+                <div class="stat-card stat-card-cyan">
+                    <div class="stat-value" id="totalEmployee">0</div>
                     <div class="stat-label">Employees</div>
                 </div>
 
-                <!-- IT Support Count -->
-                <div class="stat-card stat-card-info">
-                    <div class="stat-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/>
-                        </svg>
-                    </div>
-                    <div class="stat-value" id="totalITSupport">
-                        <span class="loading-placeholder">--</span>
-                    </div>
+                <!-- IT Support -->
+                <div class="stat-card stat-card-cyan">
+                    <div class="stat-value" id="totalITSupport">0</div>
                     <div class="stat-label">IT Support</div>
                 </div>
             </div>
 
-            <!-- Last Updated Info -->
-            <div class="last-updated" id="lastUpdated"></div>
+            <!-- Ticket Category Section -->
+            <div class="section-header">
+                <span class="section-badge">Ticket Category</span>
+            </div>
+            <div class="stats-row" id="categoryStatsRow">
+                <!-- Network -->
+                <div class="stat-card stat-card-cyan-light">
+                    <div class="stat-header">NETWORK</div>
+                    <div class="stat-value" id="categoryNetwork">0</div>
+                </div>
+
+                <!-- Account -->
+                <div class="stat-card stat-card-green-bright">
+                    <div class="stat-header">ACCOUNT</div>
+                    <div class="stat-value" id="categoryAccount">0</div>
+                </div>
+
+                <!-- Hardware -->
+                <div class="stat-card stat-card-gray-dark">
+                    <div class="stat-header">HARDWARE</div>
+                    <div class="stat-value" id="categoryHardware">0</div>
+                </div>
+
+                <!-- Software -->
+                <div class="stat-card stat-card-purple">
+                    <div class="stat-header">SOFTWARE</div>
+                    <div class="stat-value" id="categorySoftware">0</div>
+                </div>
+            </div>
+
+            <!-- Ticket Priority Section -->
+            <div class="section-header">
+                <span class="section-badge">Ticket Priority</span>
+            </div>
+            <div class="stats-row">
+                <!-- Low -->
+                <div class="stat-card stat-card-green-priority">
+                    <div class="stat-header">LOW</div>
+                    <div class="stat-value" id="priorityLow">0</div>
+                </div>
+
+                <!-- Medium -->
+                <div class="stat-card stat-card-orange-priority">
+                    <div class="stat-header">MEDIUM</div>
+                    <div class="stat-value" id="priorityMedium">0</div>
+                </div>
+
+                <!-- High -->
+                <div class="stat-card stat-card-red-priority">
+                    <div class="stat-header">HIGH</div>
+                    <div class="stat-value" id="priorityHigh">0</div>
+                </div>
+            </div>
         </div>
+
+        <!-- Refresh Button -->
+        <button class="refresh-btn" id="refreshBtn" title="Refresh Data">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
     </main>
 
     <script>
-        /**
-         * Admin Dashboard Module
-         * Handles dashboard data fetching and display
-         */
-        (function() {
-            'use strict';
+        // ========================================
+        // API Configuration & Constants
+        // ========================================
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const TOKEN_KEY = 'auth_token';
+        const USER_INFO_KEY = 'user_info';
 
-            // ==========================================
-            // Configuration
-            // ==========================================
-            const CONFIG = {
-                API_BASE_URL: '/api',
-                ENDPOINTS: {
-                    TICKETS: '/tickets',
-                    USERS: '/users'
-                },
-                STORAGE_KEYS: {
-                    TOKEN: 'auth_token',
-                    TOKEN_TYPE: 'token_type',
-                    USER: 'user_info'
-                },
-                LOGIN_URL: '/login',
-                REQUIRED_ROLE: 'ROLE_ADMIN',
-                REFRESH_INTERVAL: 60000 // Refresh data every 60 seconds
-            };
+        // ========================================
+        // Authentication Manager
+        // ========================================
+        const AuthManager = {
+            getToken() {
+                return localStorage.getItem(TOKEN_KEY);
+            },
 
-            // Ticket Status Enum (matching backend)
-            const TICKET_STATUS = {
-                OPEN: 'OPEN',
-                ASSIGNED: 'ASSIGNED',
-                IN_PROGRESS: 'IN_PROGRESS',
-                RESOLVED: 'RESOLVED',
-                CLOSED: 'CLOSED'
-            };
+            getUserInfo() {
+                const userInfo = localStorage.getItem(USER_INFO_KEY);
+                return userInfo ? JSON.parse(userInfo) : null;
+            },
 
-            // User Roles
-            const USER_ROLES = {
-                ADMIN: 'ROLE_ADMIN',
-                IT_SUPPORT: 'ROLE_IT_SUPPORT',
-                EMPLOYEE: 'ROLE_EMPLOYEE'
-            };
+            isAuthenticated() {
+                return !!this.getToken();
+            },
 
-            // ==========================================
-            // DOM Elements
-            // ==========================================
-            const elements = {
-                loadingOverlay: document.getElementById('loadingOverlay'),
-                userGreeting: document.getElementById('userGreeting'),
-                totalTickets: document.getElementById('totalTickets'),
-                totalOpen: document.getElementById('totalOpen'),
-                totalAssigned: document.getElementById('totalAssigned'),
-                totalInProgress: document.getElementById('totalInProgress'),
-                totalResolved: document.getElementById('totalResolved'),
-                totalClosed: document.getElementById('totalClosed'),
-                totalEmployee: document.getElementById('totalEmployee'),
-                totalITSupport: document.getElementById('totalITSupport'),
-                lastUpdated: document.getElementById('lastUpdated'),
-                sidebar: document.querySelector('.sidebar'),
-                toggleBtn: document.querySelector('.sidebar-toggle'),
-                mainContent: document.querySelector('.main-content')
-            };
+            hasRole(role) {
+                const userInfo = this.getUserInfo();
+                return userInfo && userInfo.roles && userInfo.roles.includes(role);
+            },
 
-            // ==========================================
-            // Authentication Functions
-            // ==========================================
+            logout() {
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(USER_INFO_KEY);
+                window.location.href = '/login';
+            },
 
-            /**
-             * Get authentication token from localStorage
-             */
-            function getAuthToken() {
-                return localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+            requireAuth() {
+                if (!this.isAuthenticated()) {
+                    window.location.href = '/login';
+                    return false;
+                }
+                return true;
+            },
+
+            isAdmin() {
+                return this.hasRole('ROLE_ADMIN');
             }
+        };
 
-            /**
-             * Get token type from localStorage
-             */
-            function getTokenType() {
-                return localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE) || 'Bearer';
-            }
+        // ========================================
+        // API Client
+        // ========================================
+        const ApiClient = {
+            async request(endpoint, options = {}) {
+                const token = AuthManager.getToken();
+                
+                const config = {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` }),
+                        ...options.headers
+                    }
+                };
 
-            /**
-             * Get user info from localStorage
-             */
-            function getUserInfo() {
-                const userStr = localStorage.getItem(CONFIG.STORAGE_KEYS.USER);
                 try {
-                    return userStr ? JSON.parse(userStr) : null;
-                } catch (e) {
-                    console.error('Error parsing user info:', e);
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                    
+                    if (response.status === 401) {
+                        AuthManager.logout();
+                        return null;
+                    }
+
+                    if (response.status === 403) {
+                        console.error('Access denied - insufficient permissions');
+                        return null;
+                    }
+
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'API request failed');
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            },
+
+            async get(endpoint) {
+                return this.request(endpoint, { method: 'GET' });
+            }
+        };
+
+        // ========================================
+        // Dashboard API Service
+        // ========================================
+        const DashboardAPI = {
+            // Get ticket report (category, priority, status statistics)
+            async getTicketReport() {
+                try {
+                    const response = await ApiClient.get('/reports/tickets');
+                    return response && response.success ? response.data : null;
+                } catch (error) {
+                    console.error('Error fetching ticket report:', error);
+                    return null;
+                }
+            },
+
+            // Get user statistics
+            async getUserStats() {
+                try {
+                    const response = await ApiClient.get('/users/stats');
+                    return response && response.success ? response.data : null;
+                } catch (error) {
+                    console.error('Error fetching user stats:', error);
                     return null;
                 }
             }
+        };
 
-            /**
-             * Check if user is authenticated
-             */
-            function isAuthenticated() {
-                const token = getAuthToken();
-                if (!token) return false;
-
-                try {
-                    const parts = token.split('.');
-                    if (parts.length !== 3) return false;
-
-                    const payload = JSON.parse(atob(parts[1]));
-                    const expiration = payload.exp * 1000;
-
-                    return Date.now() < expiration;
-                } catch (error) {
-                    console.error('Error checking authentication:', error);
-                    return false;
-                }
-            }
-
-            /**
-             * Check if user has admin role
-             */
-            function hasAdminRole() {
-                const userInfo = getUserInfo();
-                if (!userInfo || !userInfo.roles) return false;
-
-                const roles = Array.isArray(userInfo.roles) ? userInfo.roles : [];
-                return roles.includes(CONFIG.REQUIRED_ROLE);
-            }
-
-            /**
-             * Clear authentication data and redirect to login
-             */
-            function logout() {
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE);
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
-                window.location.href = CONFIG.LOGIN_URL;
-            }
-
-            /**
-             * Verify access and redirect if unauthorized
-             */
-            function verifyAccess() {
-                if (!isAuthenticated()) {
-                    console.log('Not authenticated, redirecting to login...');
-                    window.location.href = CONFIG.LOGIN_URL;
-                    return false;
-                }
-
-                if (!hasAdminRole()) {
-                    console.log('User does not have admin role, access denied');
-                    alert('Access Denied! You do not have permission to access the Admin Dashboard.');
-                    logout();
-                    return false;
-                }
-
-                return true;
-            }
-
-            // ==========================================
-            // API Functions
-            // ==========================================
-
-            /**
-             * Get authorization headers for API calls
-             */
-            function getAuthHeaders() {
-                return {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `${getTokenType()} ${getAuthToken()}`
-                };
-            }
-
-            /**
-             * Fetch all tickets from API
-             */
-            async function fetchAllTickets() {
-                const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.TICKETS}`;
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                });
-
-                if (response.status === 401 || response.status === 403) {
-                    logout();
-                    throw new Error('Unauthorized');
-                }
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch tickets: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data.success ? data.data : [];
-            }
-
-            /**
-             * Fetch all users from API
-             */
-            async function fetchAllUsers() {
-                const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.USERS}`;
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                });
-
-                if (response.status === 401 || response.status === 403) {
-                    logout();
-                    throw new Error('Unauthorized');
-                }
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch users: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data.success ? data.data : [];
-            }
-
-            // ==========================================
-            // Data Processing Functions
-            // ==========================================
-
-            /**
-             * Count tickets by status
-             */
-            function countTicketsByStatus(tickets) {
-                const counts = {
-                    total: tickets.length,
-                    [TICKET_STATUS.OPEN]: 0,
-                    [TICKET_STATUS.ASSIGNED]: 0,
-                    [TICKET_STATUS.IN_PROGRESS]: 0,
-                    [TICKET_STATUS.RESOLVED]: 0,
-                    [TICKET_STATUS.CLOSED]: 0
-                };
-
-                tickets.forEach(ticket => {
-                    if (ticket.status && counts.hasOwnProperty(ticket.status)) {
-                        counts[ticket.status]++;
-                    }
-                });
-
-                return counts;
-            }
-
-            /**
-             * Count users by role
-             */
-            function countUsersByRole(users) {
-                const counts = {
-                    [USER_ROLES.IT_SUPPORT]: 0,
-                    [USER_ROLES.EMPLOYEE]: 0,
-                    [USER_ROLES.ADMIN]: 0
-                };
-
-                users.forEach(user => {
-                    if (user.roles && Array.isArray(user.roles)) {
-                        user.roles.forEach(role => {
-                            if (counts.hasOwnProperty(role)) {
-                                counts[role]++;
-                            }
-                        });
-                    }
-                });
-
-                return counts;
-            }
-
-            // ==========================================
-            // UI Update Functions
-            // ==========================================
-
-            /**
-             * Update stat card value with animation
-             */
-            function updateStatValue(element, value) {
-                if (!element) return;
-
-                // Add animation class
-                element.classList.add('updating');
-
-                // Update value
-                element.textContent = value;
-
-                // Remove animation class after animation completes
-                setTimeout(() => {
-                    element.classList.remove('updating');
-                }, 300);
-            }
-
-            /**
-             * Update ticket statistics UI
-             */
-            function updateTicketStats(ticketCounts) {
-                updateStatValue(elements.totalTickets, ticketCounts.total);
-                updateStatValue(elements.totalOpen, ticketCounts[TICKET_STATUS.OPEN]);
-                updateStatValue(elements.totalAssigned, ticketCounts[TICKET_STATUS.ASSIGNED]);
-                updateStatValue(elements.totalInProgress, ticketCounts[TICKET_STATUS.IN_PROGRESS]);
-                updateStatValue(elements.totalResolved, ticketCounts[TICKET_STATUS.RESOLVED]);
-                updateStatValue(elements.totalClosed, ticketCounts[TICKET_STATUS.CLOSED]);
-            }
-
-            /**
-             * Update user statistics UI
-             */
-            function updateUserStats(userCounts) {
-                updateStatValue(elements.totalEmployee, userCounts[USER_ROLES.EMPLOYEE]);
-                updateStatValue(elements.totalITSupport, userCounts[USER_ROLES.IT_SUPPORT]);
-            }
-
-            /**
-             * Update last updated timestamp
-             */
-            function updateLastUpdatedTime() {
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('vi-VN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                const dateStr = now.toLocaleDateString('vi-VN');
+        // ========================================
+        // UI Manager
+        // ========================================
+        const UIManager = {
+            updateUserGreeting() {
+                const userInfo = AuthManager.getUserInfo();
+                const greetingElement = document.getElementById('userGreeting');
                 
-                if (elements.lastUpdated) {
-                    elements.lastUpdated.innerHTML = `<span>Last updated: ${dateStr} ${timeStr}</span>
-                        <button id="refreshBtn" class="refresh-btn" title="Refresh Data">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="23 4 23 10 17 10"></polyline>
-                                <polyline points="1 20 1 14 7 14"></polyline>
-                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                            </svg>
-                        </button>`;
+                if (userInfo && greetingElement) {
+                    const displayName = userInfo.fullName || userInfo.username;
+                    greetingElement.textContent = `Welcome, ${displayName}`;
+                }
+            },
+
+            updateStatValue(elementId, value, animate = true) {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+                
+                if (animate) {
+                    this.animateNumber(element, parseInt(element.textContent) || 0, value);
+                } else {
+                    element.textContent = value;
+                }
+            },
+
+            animateNumber(element, start, end, duration = 500) {
+                const startTime = performance.now();
+                const diff = end - start;
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
                     
-                    // Add click handler for refresh button
-                    document.getElementById('refreshBtn')?.addEventListener('click', loadDashboardData);
-                }
-            }
-
-            /**
-             * Display user greeting
-             */
-            function displayUserGreeting() {
-                const userInfo = getUserInfo();
-                if (userInfo && elements.userGreeting) {
-                    const name = userInfo.fullName || userInfo.username || 'Admin';
-                    elements.userGreeting.textContent = `Welcome, ${name}`;
-                }
-            }
-
-            /**
-             * Show/hide loading overlay
-             */
-            function setLoading(isLoading) {
-                if (elements.loadingOverlay) {
-                    elements.loadingOverlay.style.display = isLoading ? 'flex' : 'none';
-                }
-            }
-
-            /**
-             * Show error state in stat card
-             */
-            function showErrorState(element, message = 'Error') {
-                if (element) {
-                    element.innerHTML = `<span class="error-text">${message}</span>`;
-                }
-            }
-
-            // ==========================================
-            // Main Data Loading Function
-            // ==========================================
-
-            /**
-             * Load all dashboard data
-             */
-            async function loadDashboardData() {
-                try {
-                    setLoading(true);
-
-                    // Fetch data in parallel
-                    const [tickets, users] = await Promise.all([
-                        fetchAllTickets(),
-                        fetchAllUsers()
-                    ]);
-
-                    // Process data
-                    const ticketCounts = countTicketsByStatus(tickets);
-                    const userCounts = countUsersByRole(users);
-
-                    // Update UI
-                    updateTicketStats(ticketCounts);
-                    updateUserStats(userCounts);
-                    updateLastUpdatedTime();
-
-                    console.log('Dashboard data loaded successfully:', {
-                        tickets: ticketCounts,
-                        users: userCounts
-                    });
-
-                } catch (error) {
-                    console.error('Error loading dashboard data:', error);
+                    // Easing function for smooth animation
+                    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                    const current = Math.round(start + diff * easeOutQuart);
                     
-                    // Show error state in all stat cards
-                    showErrorState(elements.totalTickets, '--');
-                    showErrorState(elements.totalOpen, '--');
-                    showErrorState(elements.totalAssigned, '--');
-                    showErrorState(elements.totalInProgress, '--');
-                    showErrorState(elements.totalResolved, '--');
-                    showErrorState(elements.totalClosed, '--');
-                    showErrorState(elements.totalEmployee, '--');
-                    showErrorState(elements.totalITSupport, '--');
-
-                    if (elements.lastUpdated) {
-                        elements.lastUpdated.innerHTML = '<span class="error-text">Failed to load data. Click to retry.</span>';
-                        elements.lastUpdated.style.cursor = 'pointer';
-                        elements.lastUpdated.addEventListener('click', loadDashboardData, { once: true });
+                    element.textContent = current;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
                     }
-                } finally {
-                    setLoading(false);
-                }
-            }
+                };
+                
+                requestAnimationFrame(animate);
+            },
 
-            // ==========================================
-            // Event Handlers
-            // ==========================================
-
-            /**
-             * Initialize sidebar toggle
-             */
-            function initSidebar() {
-                if (elements.toggleBtn && elements.sidebar && elements.mainContent) {
-                    elements.toggleBtn.addEventListener('click', () => {
-                        elements.sidebar.classList.toggle('collapsed');
-                        elements.mainContent.classList.toggle('sidebar-collapsed');
-                    });
+            // Update Ticket & User section
+            updateTicketUserStats(report, userStats) {
+                if (report) {
+                    this.updateStatValue('totalTickets', report.totalTickets || 0);
+                    
+                    const statusMap = report.ticketsByStatus || {};
+                    this.updateStatValue('totalOpen', statusMap['OPEN'] || 0);
+                    this.updateStatValue('totalAssigned', statusMap['ASSIGNED'] || 0);
+                    this.updateStatValue('totalInProgress', statusMap['IN_PROGRESS'] || 0);
+                    this.updateStatValue('totalResolved', statusMap['RESOLVED'] || 0);
+                    this.updateStatValue('totalClosed', statusMap['CLOSED'] || 0);
                 }
 
-                // Active menu item handling
-                const menuLinks = document.querySelectorAll('.menu-link');
-                menuLinks.forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        document.querySelector('.menu-item.active')?.classList.remove('active');
-                        link.parentElement.classList.add('active');
-                    });
-                });
-            }
+                if (userStats) {
+                    this.updateStatValue('totalEmployee', userStats.totalEmployees || 0);
+                    this.updateStatValue('totalITSupport', userStats.totalITSupport || 0);
+                }
+            },
 
-            /**
-             * Initialize header buttons
-             */
-            function initHeaderButtons() {
-                // User profile button
-                document.querySelector('.btn-user')?.addEventListener('click', () => {
-                    const userInfo = getUserInfo();
-                    if (userInfo) {
-                        alert(`User Profile\n\nUsername: ${userInfo.username}\nFull Name: ${userInfo.fullName || 'N/A'}\nEmail: ${userInfo.email || 'N/A'}\nRoles: ${userInfo.roles?.join(', ') || 'N/A'}`);
-                    }
+            // Update Ticket Category section
+            updateCategoryStats(report) {
+                if (!report || !report.ticketsByCategory) return;
+                
+                const categoryMap = report.ticketsByCategory;
+                this.updateStatValue('categoryNetwork', categoryMap['NETWORK'] || 0);
+                this.updateStatValue('categoryAccount', categoryMap['ACCOUNT'] || 0);
+                this.updateStatValue('categoryHardware', categoryMap['HARDWARE'] || 0);
+                this.updateStatValue('categorySoftware', categoryMap['SOFTWARE'] || 0);
+            },
+
+            // Update Ticket Priority section
+            updatePriorityStats(report) {
+                if (!report || !report.ticketsByPriority) return;
+                
+                const priorityMap = report.ticketsByPriority;
+                this.updateStatValue('priorityLow', priorityMap['LOW'] || 0);
+                this.updateStatValue('priorityMedium', priorityMap['MEDIUM'] || 0);
+                this.updateStatValue('priorityHigh', priorityMap['HIGH'] || 0);
+            },
+
+            showLoading() {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            },
+
+            hideLoading() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            },
+
+            showError(message) {
+                console.error(message);
+                this.showToast(message, 'error');
+            },
+
+            showSuccess(message) {
+                this.showToast(message, 'success');
+            },
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        ${type === 'success' 
+                            ? '<polyline points="20 6 9 17 4 12"></polyline>'
+                            : type === 'error'
+                            ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'
+                            : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>'
+                        }
+                    </svg>
+                    <span>${message}</span>
+                `;
+                
+                container.appendChild(toast);
+
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    toast.style.animation = 'slideInRight 0.3s ease reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        };
+
+        // ========================================
+        // Dashboard Controller
+        // ========================================
+        const DashboardController = {
+            async init() {
+                // Check authentication
+                if (!AuthManager.requireAuth()) return;
+                
+                // Check admin role
+                if (!AuthManager.isAdmin()) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Setup UI
+                this.setupEventListeners();
+                UIManager.updateUserGreeting();
+                
+                // Load dashboard data
+                await this.loadDashboardData();
+            },
+
+            setupEventListeners() {
+                // Toggle sidebar
+                const sidebar = document.querySelector('.sidebar');
+                const toggleBtn = document.querySelector('.sidebar-toggle');
+                const mainContent = document.querySelector('.main-content');
+                
+                toggleBtn?.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('sidebar-collapsed');
                 });
 
                 // Logout button
                 document.querySelector('.btn-logout')?.addEventListener('click', () => {
                     if (confirm('Are you sure you want to logout?')) {
-                        logout();
+                        AuthManager.logout();
                     }
                 });
-            }
 
-            // ==========================================
-            // Initialization
-            // ==========================================
+                // User profile button
+                document.querySelector('.btn-user')?.addEventListener('click', () => {
+                    window.location.href = '/profile';
+                });
 
-            /**
-             * Initialize dashboard
-             */
-            function init() {
-                // Verify access first
-                if (!verifyAccess()) {
-                    return;
+                // Refresh button
+                const refreshBtn = document.getElementById('refreshBtn');
+                refreshBtn?.addEventListener('click', async () => {
+                    refreshBtn.classList.add('spinning');
+                    await this.refresh();
+                    refreshBtn.classList.remove('spinning');
+                    UIManager.showSuccess('Dashboard refreshed successfully!');
+                });
+            },
+
+            async loadDashboardData() {
+                UIManager.showLoading();
+                
+                try {
+                    // Fetch all data in parallel
+                    const [ticketReport, userStats] = await Promise.all([
+                        DashboardAPI.getTicketReport(),
+                        DashboardAPI.getUserStats()
+                    ]);
+
+                    // Update UI with fetched data
+                    UIManager.updateTicketUserStats(ticketReport, userStats);
+                    UIManager.updateCategoryStats(ticketReport);
+                    UIManager.updatePriorityStats(ticketReport);
+
+                    console.log('Dashboard data loaded successfully');
+                } catch (error) {
+                    UIManager.showError('Failed to load dashboard data');
+                    console.error('Dashboard load error:', error);
+                } finally {
+                    UIManager.hideLoading();
                 }
+            },
 
-                // Display user greeting
-                displayUserGreeting();
-
-                // Initialize UI components
-                initSidebar();
-                initHeaderButtons();
-
-                // Load dashboard data
-                loadDashboardData();
-
-                // Set up auto-refresh
-                setInterval(loadDashboardData, CONFIG.REFRESH_INTERVAL);
+            async refresh() {
+                await this.loadDashboardData();
             }
+        };
 
-            // Run initialization when DOM is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-        })();
+        // ========================================
+        // Initialize Dashboard on DOM Ready
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            DashboardController.init();
+        });
     </script>
 </body>
 </html>
