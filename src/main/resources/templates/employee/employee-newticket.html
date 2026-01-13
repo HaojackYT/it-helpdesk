@@ -99,7 +99,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Date:</label>
-                            <input type="date" id="date" class="form-input" readonly>
+                            <input type="text" id="date" class="form-input" readonly>
                         </div>
                     </div>
                     
@@ -366,11 +366,14 @@
                 if (userInfo) {
                     // Fill name
                     document.getElementById('name').value = userInfo.fullName || userInfo.username || '';
-                    
-                    // Fill current date
-                    const today = new Date().toISOString().split('T')[0];
-                    document.getElementById('date').value = today;
-                    
+
+                    // Fill current date as dd/mm/yyyy (display-only)
+                    const d = new Date();
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const yyyy = d.getFullYear();
+                    document.getElementById('date').value = `${dd}/${mm}/${yyyy}`;
+
                     // Fill department from user info
                     document.getElementById('department').value = userInfo.department || '';
                 }
