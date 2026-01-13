@@ -5,6 +5,7 @@ import com.ithd.it_helpdesk.dto.request.CreateUserRequest;
 import com.ithd.it_helpdesk.dto.request.UpdateUserRequest;
 import com.ithd.it_helpdesk.dto.response.ApiResponse;
 import com.ithd.it_helpdesk.dto.response.UserResponse;
+import com.ithd.it_helpdesk.dto.response.UserStatsResponse;
 import com.ithd.it_helpdesk.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,12 @@ public class UserController {
     public ResponseEntity<ApiResponse<Long>> countUsersByRole(@RequestParam(required = false) String role) {
         long count = userService.countByRole(role);
         return ResponseEntity.ok(ApiResponse.success(count));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<UserStatsResponse>> getUserStats() {
+        UserStatsResponse stats = userService.getUserStats();
+        return ResponseEntity.ok(ApiResponse.success(stats));
     }
 
     @GetMapping("/{id}")

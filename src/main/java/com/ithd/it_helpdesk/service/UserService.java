@@ -5,6 +5,7 @@ import com.ithd.it_helpdesk.dto.request.CreateUserRequest;
 import com.ithd.it_helpdesk.dto.request.UpdateProfileRequest;
 import com.ithd.it_helpdesk.dto.request.UpdateUserRequest;
 import com.ithd.it_helpdesk.dto.response.UserResponse;
+import com.ithd.it_helpdesk.dto.response.UserStatsResponse;
 import com.ithd.it_helpdesk.entity.Role;
 import com.ithd.it_helpdesk.entity.User;
 import com.ithd.it_helpdesk.exception.ResourceNotFoundException;
@@ -62,6 +63,23 @@ public class UserService {
         } catch (IllegalArgumentException ex) {
             return 0L;
         }
+    }
+
+    /**
+     * Get user statistics by roles
+     */
+    public UserStatsResponse getUserStats() {
+        long totalUsers = userRepository.count();
+        long totalEmployees = userRepository.countByRoleName(Role.RoleName.ROLE_EMPLOYEE);
+        long totalITSupport = userRepository.countByRoleName(Role.RoleName.ROLE_IT_SUPPORT);
+        long totalAdmins = userRepository.countByRoleName(Role.RoleName.ROLE_ADMIN);
+
+        return UserStatsResponse.builder()
+                .totalUsers(totalUsers)
+                .totalEmployees(totalEmployees)
+                .totalITSupport(totalITSupport)
+                .totalAdmins(totalAdmins)
+                .build();
     }
 
     @Transactional
