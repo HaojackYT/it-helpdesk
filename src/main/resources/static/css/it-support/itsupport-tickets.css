@@ -189,10 +189,11 @@ body {
 
 /* Column Specific Styles */
 .td-id { font-weight: 600; color: var(--text-primary); font-family: 'Courier New', monospace; }
-.td-title, .td-description { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-title, .td-description { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .td-category { font-weight: 600; font-size: 12px; color: var(--text-secondary); letter-spacing: 0.5px; }
 .td-priority { font-weight: 600; font-size: 12px; letter-spacing: 0.5px; }
 .td-created { color: var(--text-secondary); font-size: 13px; white-space: nowrap; }
+.th-update-status { min-width: 140px; }
 
 /* Status Badges */
 .status-badge { display: inline-block; padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
@@ -202,9 +203,43 @@ body {
 .status-open { background-color: var(--status-open); color: #ffffff; }
 .status-progress { background-color: var(--status-progress); color: #000000; }
 
-/* Status Select Column (removed) */
-.status-select { height: 36px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer; outline: none; }
-.status-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(78,205,196,0.06); }
+/* Status Select Column - Update Status Dropdown */
+.td-update-status { min-width: 140px; }
+.status-select-wrapper { position: relative; display: inline-block; }
+.status-select { 
+    height: 32px; 
+    padding: 4px 28px 4px 10px; 
+    border: none; 
+    border-radius: 6px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    letter-spacing: 0.5px; 
+    text-transform: uppercase;
+    cursor: pointer; 
+    outline: none; 
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    transition: all 0.2s ease;
+}
+.status-select:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.status-select:focus { box-shadow: 0 0 0 3px rgba(0,0,0,0.1); }
+.status-select:disabled { opacity: 0.7; cursor: not-allowed; }
+.status-select.updating { opacity: 0.6; pointer-events: none; }
+
+/* Status Select Colors - matching badge colors */
+.status-select.status-resolved { background-color: var(--status-resolved); color: #ffffff; }
+.status-select.status-assigned { background-color: var(--status-assigned); color: #ffffff; }
+.status-select.status-closed { background-color: var(--status-closed); color: #ffffff; }
+.status-select.status-open { background-color: var(--status-open); color: #ffffff; }
+.status-select.status-progress { background-color: var(--status-progress); color: #000000; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
+
+/* Ticket ID Link */
+.ticket-link { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+.ticket-link:hover { text-decoration: underline; }
 
 /* Action Buttons */
 .action-buttons { display: flex; gap: 8px; align-items: center; }
