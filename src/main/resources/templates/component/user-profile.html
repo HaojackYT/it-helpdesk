@@ -65,10 +65,18 @@
             }
         }
 
-        // hide modal on close or background click
-        (function() {
+        // Initialize user profile modal - wait for DOM to be ready
+        function initUserProfileModal() {
             const modal = document.getElementById('userProfileModal');
-            if (!modal) return;
+            if (!modal) {
+                console.warn('userProfileModal not found, retrying...');
+                setTimeout(initUserProfileModal, 100);
+                return;
+            }
+
+            console.log('User profile modal found, initializing...');
+
+            // hide modal on close or background click
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) modal.style.display = 'none';
             });
@@ -76,72 +84,110 @@
             closeBtn?.addEventListener('click', () => { modal.style.display = 'none'; });
 
             const editBtn = modal.querySelector('.user-profile-edit');
-            editBtn?.addEventListener('click', async () => {
-                try {
-                    const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
-                    const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
-                    const headers = { 'Accept': 'application/json' };
-                    if (token) headers['Authorization'] = `${tokenType} ${token}`;
+            if (editBtn) {
+                console.log('Edit button found, attaching event listener...');
+                editBtn.addEventListener('click', async () => {
+                    console.log('Edit button clicked!');
+                    try {
+                        const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
+                        const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
+                        const headers = { 'Accept': 'application/json' };
+                        if (token) headers['Authorization'] = `${tokenType} ${token}`;
 
-                    const resp = await fetch('/api/users/me', { headers });
-                    if (!resp.ok) throw new Error('Failed to fetch profile');
-                    const body = await resp.json();
-                    const serverUser = (body && body.success && body.data) ? body.data : body;
-                    _currentProfile = serverUser;
-                    openInlineEditModal(serverUser);
-                } catch (err) {
-                    console.error('Could not open edit modal', err);
-                    alert('Không thể mở chỉnh sửa hồ sơ. Vui lòng thử lại.');
-                }
-            });
-        })();
+                        const resp = await fetch('/api/users/me', { headers });
+                        if (!resp.ok) throw new Error('Failed to fetch profile');
+                        const body = await resp.json();
+                        const serverUser = (body && body.success && body.data) ? body.data : body;
+                        _currentProfile = serverUser;
+                        console.log('Opening edit modal with user:', serverUser);
+                        openInlineEditModal(serverUser);
+                    } catch (err) {
+                        console.error('Could not open edit modal', err);
+                        alert('Không thể mở chỉnh sửa hồ sơ. Vui lòng thử lại.');
+                    }
+                });
+            } else {
+                console.error('Edit button not found!');
+            }
+
+            // Create inline edit modal
+            createInlineEditModal();
+        }
         
         // Inline edit modal (built into this fragment)
-        (function() {
+        function createInlineEditModal() {
+            console.log('Creating inline edit modal...');
             const modalHtml = `
-                <div class="modal-overlay" id="inlineEditUserModal" style="display:none;">
-                    <div class="modal-container">
-                        <div class="modal-header">
+                <div id="inlineEditUserModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;">
+                    <div style="max-width:450px;width:90%;background:#fff;border-radius:10px;padding:0;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+                        <div style="background:linear-gradient(90deg,#3ec9b0,#3aa79a);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-radius:10px 10px 0 0;">
                             <div style="display:flex;align-items:center;gap:12px;">
-                                <div class="edit-avatar" style="width:56px;height:56px;background:#ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="#000">
+                                <div style="width:56px;height:56px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="#fff">
                                         <circle cx="12" cy="8" r="4"></circle>
                                         <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
                                     </svg>
                                 </div>
-                                <h3>Edit User Profile</h3>
+                                <h3 style="margin:0;font-size:18px;">Edit User Profile</h3>
                             </div>
-                            <button class="modal-close" aria-label="Close">&times;</button>
+                            <button id="ieCloseBtn" type="button" style="background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;padding:0;line-height:1;">&times;</button>
                         </div>
-                        <div class="modal-body">
+                        <div style="padding:20px;background:#f7f7f7;border-radius:0 0 10px 10px;">
                             <form id="inlineEditUserForm">
-                                <div class="form-row"><label>Full name</label><input id="ieFullName" type="text" autocomplete="name"/></div>
-                                <div class="form-row"><label>Current password</label><input id="ieCurrentPassword" type="password" autocomplete="current-password"/></div>
-                                <div class="form-row"><label>New password</label><input id="ieNewPassword" type="password" autocomplete="new-password"/></div>
-                                <div class="form-row"><label>Confirm new password</label><input id="ieConfirmPassword" type="password" autocomplete="new-password"/></div>
-                                <div style="text-align:right; margin-top:12px;"><button type="submit">Save</button></div>
+                                <div style="margin-bottom:15px;"><label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">Full name</label><input id="ieFullName" type="text" autocomplete="name" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;"/></div>
+                                <div style="margin-bottom:15px;"><label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">Current password</label><input id="ieCurrentPassword" type="password" autocomplete="current-password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;"/></div>
+                                <div style="margin-bottom:15px;"><label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">New password</label><input id="ieNewPassword" type="password" autocomplete="new-password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;"/></div>
+                                <div style="margin-bottom:15px;"><label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">Confirm new password</label><input id="ieConfirmPassword" type="password" autocomplete="new-password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;"/></div>
+                                <div style="text-align:right; margin-top:16px;"><button type="submit" style="background:#3ec9b0;color:#fff;border:none;padding:12px 24px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;">Save</button></div>
                             </form>
                         </div>
                     </div>
                 </div>`;
 
+            const userProfileModal = document.getElementById('userProfileModal');
+            if (!userProfileModal) {
+                console.error('Cannot create inline edit modal: userProfileModal not found!');
+                return;
+            }
+
             const wrapper = document.createElement('div');
             wrapper.innerHTML = modalHtml;
-            document.getElementById('userProfileModal').appendChild(wrapper);
+            // Append to body instead of userProfileModal to avoid z-index stacking issues
+            document.body.appendChild(wrapper.firstElementChild);
 
             const ieModal = document.getElementById('inlineEditUserModal');
-            const ieClose = ieModal.querySelector('.modal-close');
+            if (!ieModal) {
+                console.error('Failed to create inlineEditUserModal!');
+                return;
+            }
+
+            console.log('Inline edit modal created successfully and appended to body');
+
+            const ieClose = document.getElementById('ieCloseBtn');
             const ieForm = document.getElementById('inlineEditUserForm');
 
-            ieClose.addEventListener('click', () => { ieModal.style.display = 'none'; });
-            ieModal.addEventListener('click', (e) => { if (e.target === ieModal) ieModal.style.display = 'none'; });
+            ieClose?.addEventListener('click', () => { 
+                console.log('Closing edit modal');
+                ieModal.style.display = 'none'; 
+            });
+            ieModal.addEventListener('click', (e) => { 
+                if (e.target === ieModal) {
+                    console.log('Closing edit modal (clicked outside)');
+                    ieModal.style.display = 'none';
+                }
+            });
 
             window.openInlineEditModal = function(user) {
-                if (!user) return;
+                console.log('openInlineEditModal called with user:', user);
+                if (!user) {
+                    console.error('No user provided to openInlineEditModal');
+                    return;
+                }
                 document.getElementById('ieFullName').value = user.fullName || user.fullname || '';
                 document.getElementById('ieCurrentPassword').value = '';
                 document.getElementById('ieNewPassword').value = '';
                 document.getElementById('ieConfirmPassword').value = '';
+                console.log('Showing edit modal');
                 ieModal.style.display = 'flex';
             }
 
@@ -220,6 +266,13 @@
                     alert(msg);
                 }
             });
-        })();
+        }
+
+        // Auto-initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initUserProfileModal);
+        } else {
+            initUserProfileModal();
+        }
     </script>
 </div>
