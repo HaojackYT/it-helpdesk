@@ -142,12 +142,12 @@
                     <thead>
                         <tr>
                             <th class="th-id">ID</th>
-                            <th class="th-title">Title</th>
                             <th class="th-description">Description</th>
                             <th class="th-category">Category</th>
                             <th class="th-priority">Priority</th>
-                            <th class="th-created">Created At</th>
+                            <th class="th-created">Date</th>
                             <th class="th-status">Status</th>
+                            <th class="th-update-status">Update Status</th>
                             <th class="th-action">Action</th>
                         </tr>
                     </thead>
@@ -377,10 +377,25 @@
             },
             filterAndRenderTickets() { const { tickets, searchTerm } = this.state; this.state.filteredTickets = tickets.filter(ticket => { if (!searchTerm) return true; const searchableFields = [ ticket.id, ticket.title, ticket.description, ticket.category, ticket.priority, ticket.status, ticket.createdBy?.fullName, ticket.assignedTo?.fullName ].filter(Boolean).map(field => String(field).toLowerCase()); return searchableFields.some(field => field.includes(searchTerm)); }); this.renderTickets(); this.renderPagination(); },
             renderTickets() { const { filteredTickets, currentPage, entriesPerPage } = this.state; const tableBody = document.getElementById('ticketsTableBody'); const tableWrapper = document.getElementById('tableWrapper'); const emptyState = document.getElementById('emptyState'); this.hideLoading(); this.hideError(); if (filteredTickets.length === 0) { tableWrapper.style.display = 'none'; emptyState.style.display = 'flex'; document.getElementById('paginationWrapper').style.display = 'none'; return; } emptyState.style.display = 'none'; tableWrapper.style.display = 'block'; document.getElementById('paginationWrapper').style.display = 'flex'; const startIndex = (currentPage - 1) * entriesPerPage; const endIndex = Math.min(startIndex + entriesPerPage, filteredTickets.length); const paginatedTickets = filteredTickets.slice(startIndex, endIndex); tableBody.innerHTML = paginatedTickets.map(ticket => this.createTicketRow(ticket)).join(''); this.addRowHoverEffects(); },
-            createTicketRow(ticket) { const shortId = ticket.id ? ticket.id.substring(0, 8) : 'N/A'; const title = this.truncateText(ticket.title || 'N/A', 20); const description = this.truncateText(ticket.description || 'N/A', 20); const category = ticket.category || 'N/A'; const priority = ticket.priority || 'N/A'; const status = (ticket.status || 'OPEN').toString().toUpperCase(); const createdAt = this.formatDateTime(ticket.createdAt); const statusClass = this.getStatusClass(status); const isClosable = !['RESOLVED', 'CLOSED'].includes(status); return `
+            createTicketRow(ticket) { 
+                const shortId = ticket.id ? ticket.id.substring(0, 8) : 'N/A'; 
+                const description = this.truncateText(ticket.description || 'N/A', 25); 
+                const category = ticket.category || 'N/A'; 
+                const priority = ticket.priority || 'N/A'; 
+                const status = (ticket.status || 'OPEN').toString().toUpperCase(); 
+                const createdAt = this.formatDate(ticket.createdAt); 
+                const statusClass = this.getStatusClass(status); 
+                const isClosable = !['RESOLVED', 'CLOSED'].includes(status); 
+                
+                // Generate status options for dropdown
+                const statusOptions = ['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+                const statusSelectOptions = statusOptions.map(s => 
+                    `<option value="${s}" ${s === status ? 'selected' : ''} class="status-option-${s.toLowerCase().replace('_', '-')}">${this.formatStatus(s)}</option>`
+                ).join('');
+                
+                return `
                     <tr class="ticket-row" data-id="${ticket.id}">
-                        <td class="td-id" title="${ticket.id}">${shortId}</td>
-                        <td class="td-title" title="${ticket.title || ''}">${title}</td>
+                        <td class="td-id" title="${ticket.id}"><a href="#" class="ticket-link" onclick="event.preventDefault(); TicketsManager.showMoreInfo('${ticket.id}')">${shortId}</a></td>
                         <td class="td-description" title="${ticket.description || ''}">${description}</td>
                         <td class="td-category">${category}</td>
                         <td class="td-priority priority-${String(priority).toLowerCase()}">${priority}</td>
@@ -388,10 +403,15 @@
                         <td class="td-status">
                             <span class="status-badge ${statusClass}" id="statusBadge-${ticket.id}">${this.formatStatus(status)}</span>
                         </td>
-                        
+                        <td class="td-update-status">
+                            <div class="status-select-wrapper">
+                                <select class="status-select ${statusClass}" id="statusSelect-${ticket.id}" onchange="TicketsManager.updateTicketStatus('${ticket.id}', this.value)">
+                                    ${statusSelectOptions}
+                                </select>
+                            </div>
+                        </td>
                         <td class="td-action">
                             <div class="action-buttons">
-                                
                                 <button class="action-btn" title="More Info" onclick="TicketsManager.showMoreInfo('${ticket.id}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
@@ -410,7 +430,8 @@
                             </div>
                         </td>
                     </tr>
-                `; },
+                `; 
+            },
             renderPagination() { const { filteredTickets, currentPage, entriesPerPage } = this.state; const totalPages = Math.ceil(filteredTickets.length / entriesPerPage); const startIndex = (currentPage - 1) * entriesPerPage + 1; const endIndex = Math.min(currentPage * entriesPerPage, filteredTickets.length); document.getElementById('paginationInfo').textContent = `Showing ${filteredTickets.length > 0 ? startIndex : 0} to ${endIndex} of ${filteredTickets.length} entries`; const paginationControls = document.getElementById('paginationControls'); let paginationHTML = ''; paginationHTML += `
                     <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} 
                             onclick="TicketsManager.goToPage(${currentPage - 1})" aria-label="Previous page">
@@ -435,6 +456,7 @@
             addRowHoverEffects() { const rows = document.querySelectorAll('.ticket-row'); rows.forEach(row => { row.addEventListener('mouseenter', function() { this.style.transform = 'translateX(4px)'; }); row.addEventListener('mouseleave', function() { this.style.transform = 'translateX(0)'; }); }); },
             truncateText(text, maxLength) { if (!text) return 'N/A'; return text.length > maxLength ? text.substring(0, maxLength) + '...' : text; },
             formatDateTime(dateTimeStr) { if (!dateTimeStr) return 'N/A'; try { const date = new Date(dateTimeStr); const hours = date.getHours().toString().padStart(2, '0'); const minutes = date.getMinutes().toString().padStart(2, '0'); const seconds = date.getSeconds().toString().padStart(2, '0'); const day = date.getDate().toString().padStart(2, '0'); const month = (date.getMonth() + 1).toString().padStart(2, '0'); const year = date.getFullYear(); return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`; } catch { return 'N/A'; } },
+            formatDate(dateTimeStr) { if (!dateTimeStr) return 'N/A'; try { const date = new Date(dateTimeStr); const day = date.getDate().toString().padStart(2, '0'); const month = (date.getMonth() + 1).toString().padStart(2, '0'); const year = date.getFullYear().toString().slice(-2); return `${day}/${month}/${year}`; } catch { return 'N/A'; } },
             formatStatus(status) { if (!status) return 'OPEN'; return status.replace('_', ' '); },
             getStatusClass(status) { const statusMap = { 'OPEN': 'status-open', 'ASSIGNED': 'status-assigned', 'IN_PROGRESS': 'status-progress', 'RESOLVED': 'status-resolved', 'CLOSED': 'status-closed' }; return statusMap[status] || 'status-open'; },
             showLoading() { this.state.isLoading = true; document.getElementById('loadingState').style.display = 'flex'; document.getElementById('tableWrapper').style.display = 'none'; document.getElementById('emptyState').style.display = 'none'; document.getElementById('errorState').style.display = 'none'; document.getElementById('paginationWrapper').style.display = 'none'; },
@@ -751,6 +773,75 @@
                 } catch (err) {
                     console.error('Error in closeTicketWithForm:', err);
                     this.showToast('Error closing ticket: ' + (err.message || err), 'error');
+                }
+            },
+
+            // Update ticket status via dropdown
+            async updateTicketStatus(ticketId, newStatus) {
+                const authHeader = AuthManager.getAuthHeader();
+                if (!authHeader) { AuthManager.logout(); return; }
+
+                const selectEl = document.getElementById(`statusSelect-${ticketId}`);
+                const badgeEl = document.getElementById(`statusBadge-${ticketId}`);
+                const previousStatus = selectEl?.dataset?.previousStatus || selectEl?.value;
+
+                try {
+                    // Show loading state
+                    if (selectEl) {
+                        selectEl.disabled = true;
+                        selectEl.classList.add('updating');
+                    }
+
+                    const response = await fetch(`${this.API_BASE_URL}/${ticketId}/status`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Accept': 'application/json', 
+                            'Authorization': authHeader 
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    if (response.status === 401) { AuthManager.logout(); return; }
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || 'Failed to update status');
+                    }
+
+                    // Update badge display
+                    if (badgeEl) {
+                        const statusClass = this.getStatusClass(newStatus);
+                        badgeEl.className = `status-badge ${statusClass}`;
+                        badgeEl.textContent = this.formatStatus(newStatus);
+                    }
+
+                    // Update select styling
+                    if (selectEl) {
+                        selectEl.className = `status-select ${this.getStatusClass(newStatus)}`;
+                        selectEl.dataset.previousStatus = newStatus;
+                    }
+
+                    this.showToast(`Status updated to ${this.formatStatus(newStatus)}`, 'success');
+
+                    // Update local state
+                    const ticketIndex = this.state.tickets.findIndex(t => t.id === ticketId);
+                    if (ticketIndex !== -1) {
+                        this.state.tickets[ticketIndex].status = newStatus;
+                    }
+
+                } catch (err) {
+                    console.error('Error updating ticket status:', err);
+                    this.showToast('Failed to update status: ' + (err.message || err), 'error');
+                    
+                    // Revert select to previous value
+                    if (selectEl && previousStatus) {
+                        selectEl.value = previousStatus;
+                    }
+                } finally {
+                    if (selectEl) {
+                        selectEl.classList.remove('updating');
+                        selectEl.disabled = false;
+                    }
                 }
             }
         };
