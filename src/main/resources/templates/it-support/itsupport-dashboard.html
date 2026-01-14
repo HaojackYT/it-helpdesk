@@ -83,17 +83,6 @@
                         <span class="menu-text">My Tickets</span>
                     </a>
                 </li>
-                
-                <li class="menu-item">
-                    <a href="/support/performance" class="menu-link">
-                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                        <span class="menu-text">Performance</span>
-                    </a>
-                </li>
             </ul>
         </nav>
     </aside>
@@ -125,7 +114,7 @@
                 </div>
             </div>
 
-            <!-- Second Row: 3 cards centered -->
+            <!-- Second Row: 2 cards centered -->
             <div class="stats-grid-secondary">
                 <div class="stat-card stat-card-green">
                     <div class="stat-header">Resolved</div>
@@ -135,11 +124,6 @@
                 <div class="stat-card stat-card-red">
                     <div class="stat-header">Closed</div>
                     <div class="stat-value" id="totalClosed"><span class="loading-placeholder">--</span></div>
-                </div>
-
-                <div class="stat-card stat-card-cyan">
-                    <div class="stat-header">Employees</div>
-                    <div class="stat-value" id="totalEmployees"><span class="loading-placeholder">--</span></div>
                 </div>
             </div>
         </div>
@@ -165,7 +149,7 @@
             const CONFIG = {
                 API_BASE_URL: '/api',
                 ENDPOINTS: {
-                    TICKETS: '/tickets',
+                    TICKETS: '/tickets/my',
                     USERS: '/users'
                 }
             };
@@ -179,7 +163,6 @@
                 assignedTickets: document.getElementById('assignedTickets'),
                 totalInProgress: document.getElementById('totalInProgress'),
                 totalClosed: document.getElementById('totalClosed'),
-                totalEmployees: document.getElementById('totalEmployees'),
                 lastUpdated: document.getElementById('lastUpdated'),
                 refreshBtn: document.getElementById('refreshBtn'),
                 sidebar: document.querySelector('.sidebar'),
@@ -226,23 +209,6 @@
                 } catch (err) {
                     console.warn('Unable to fetch users:', err);
                     return [];
-                }
-            }
-
-            // Fetch employee count from a lightweight endpoint (does not require USER_VIEW permission)
-            async function fetchEmployeeCount() {
-                const url = `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.USERS}/count?role=EMPLOYEE`;
-                try {
-                    const response = await fetch(url, { headers: getAuthHeaders() });
-                    if (!response.ok) throw new Error('Failed to fetch employee count');
-                    const result = await response.json();
-                    // ApiResponse.success wraps the value in .data
-                    if (result && (typeof result === 'number')) return result;
-                    if (result && result.success && (typeof result.data === 'number')) return result.data;
-                    return 0;
-                } catch (err) {
-                    console.warn('Unable to fetch employee count:', err);
-                    return 0;
                 }
             }
 
@@ -319,15 +285,10 @@
                 try {
                     if (elements.loadingOverlay) elements.loadingOverlay.style.display = 'flex';
 
-                    const [tickets, employeeCount] = await Promise.all([
-                        fetchTickets(),
-                        fetchEmployeeCount()
-                    ]);
+                    const tickets = await fetchTickets();
 
                     const stats = calculateStatistics(tickets);
                     updateStatistics(stats);
-
-                    updateStatValue(elements.totalEmployees, employeeCount || 0);
 
                     updateLastUpdatedTime();
                 } catch (error) {

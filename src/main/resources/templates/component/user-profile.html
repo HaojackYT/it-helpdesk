@@ -56,44 +56,10 @@
                         document.getElementById('profileStatus').textContent = raw.status || 'Active';
                         document.getElementById('profileDepartment').textContent = raw.department || '';
 
-                        // createdAt: try multiple property names; if not present, fetch from /api/users/me
-                        const createdAtValue = raw.createdAt || raw.created_at || raw.created || raw.createdAtIso || raw.created_at_iso || '';
+                        // createdAt: always show Null for test accounts
                         const createdEl = document.getElementById('profileCreatedAt');
-                        if (createdAtValue) {
-                            createdEl.textContent = createdAtValue;
-                            modal.style.display = 'flex';
-                        } else {
-                            // attempt to fetch profile from server (requires auth)
-                            (async function fetchFullProfile() {
-                                try {
-                                    const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
-                                    const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
-                                    const headers = { 'Accept': 'application/json' };
-                                    if (token) headers['Authorization'] = `${tokenType} ${token}`;
-
-                                    const resp = await fetch('/api/users/me', { headers });
-                                    if (!resp.ok) throw new Error('Failed to fetch profile');
-                                    const body = await resp.json();
-                                    const serverUser = (body && body.success && body.data) ? body.data : body;
-                                    if (serverUser) {
-                                        // update fields from server response
-                                        document.getElementById('profileFullName').textContent = serverUser.fullName || serverUser.fullname || serverUser.username || document.getElementById('profileFullName').textContent;
-                                        document.getElementById('profileUsername').textContent = serverUser.username || document.getElementById('profileUsername').textContent;
-                                        document.getElementById('profileEmail').textContent = serverUser.email || document.getElementById('profileEmail').textContent;
-                                        if (serverUser.roles && Array.isArray(serverUser.roles)) {
-                                            document.getElementById('profileRoles').textContent = serverUser.roles.map(formatRoleString).join(', ');
-                                        }
-                                        document.getElementById('profileStatus').textContent = serverUser.status || document.getElementById('profileStatus').textContent;
-                                        document.getElementById('profileDepartment').textContent = serverUser.department || document.getElementById('profileDepartment').textContent;
-                                        createdEl.textContent = serverUser.createdAt || serverUser.created_at || serverUser.created || '';
-                                    }
-                                } catch (err) {
-                                    console.warn('Could not fetch full profile', err);
-                                } finally {
-                                    modal.style.display = 'flex';
-                                }
-                            })();
-                        }
+                        createdEl.textContent = 'Null';
+                        modal.style.display = 'flex';
             } catch (e) {
                 console.warn('Unable to show user profile', e);
             }
@@ -137,9 +103,11 @@
                     <div class="modal-container">
                         <div class="modal-header">
                             <div style="display:flex;align-items:center;gap:12px;">
-                                <div class="edit-avatar">
-                                    <img id="ieAvatarPreview" src="" alt="avatar" />
-                                    <label class="upload-label">Upload Image<input id="ieAvatarFile" type="file" accept="image/*"/></label>
+                                <div class="edit-avatar" style="width:56px;height:56px;background:#ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="#000">
+                                        <circle cx="12" cy="8" r="4"></circle>
+                                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                                    </svg>
                                 </div>
                                 <h3>Edit User Profile</h3>
                             </div>
@@ -147,16 +115,10 @@
                         </div>
                         <div class="modal-body">
                             <form id="inlineEditUserForm">
-                                <div class="form-row"><label>Username</label><input id="ieUsername" type="text" readonly/></div>
-                                <div class="form-row"><label>Full name</label><input id="ieFullName" type="text" autocomplete="name" readonly/></div>
+                                <div class="form-row"><label>Full name</label><input id="ieFullName" type="text" autocomplete="name"/></div>
                                 <div class="form-row"><label>Current password</label><input id="ieCurrentPassword" type="password" autocomplete="current-password"/></div>
                                 <div class="form-row"><label>New password</label><input id="ieNewPassword" type="password" autocomplete="new-password"/></div>
                                 <div class="form-row"><label>Confirm new password</label><input id="ieConfirmPassword" type="password" autocomplete="new-password"/></div>
-                                <div class="form-row"><label>Email</label><input id="ieEmail" type="email" readonly/></div>
-                                <div class="form-row"><label>Roles</label><input id="ieRoles" type="text" readonly/></div>
-                                <div class="form-row"><label>Status</label><input id="ieStatus" type="text" readonly value="ACTIVE"/></div>
-                                <div class="form-row"><label>Department</label><input id="ieDepartment" type="text" readonly/></div>
-                                <div class="form-row"><label>Created at</label><input id="ieCreatedAt" type="text" readonly/></div>
                                 <div style="text-align:right; margin-top:12px;"><button type="submit">Save</button></div>
                             </form>
                         </div>
@@ -176,24 +138,10 @@
 
             window.openInlineEditModal = function(user) {
                 if (!user) return;
-                document.getElementById('ieUsername').value = user.username || '';
                 document.getElementById('ieFullName').value = user.fullName || user.fullname || '';
                 document.getElementById('ieCurrentPassword').value = '';
                 document.getElementById('ieNewPassword').value = '';
                 document.getElementById('ieConfirmPassword').value = '';
-                document.getElementById('ieEmail').value = user.email || '';
-                document.getElementById('ieRoles').value = (user.roles && Array.isArray(user.roles)) ?
-                    user.roles.map(r => r.toString().replace(/^ROLE_/, '').replace(/_/g, ' ').toUpperCase()).join(', ') : (user.roles || '');
-                document.getElementById('ieStatus').value = user.status || 'ACTIVE';
-                document.getElementById('ieDepartment').value = user.department || '';
-                document.getElementById('ieCreatedAt').value = user.createdAt || user.created_at || '';
-                // avatar preview (if available)
-                const avatarPreview = document.getElementById('ieAvatarPreview');
-                if (user.avatarUrl) {
-                    avatarPreview.src = user.avatarUrl;
-                } else {
-                    avatarPreview.src = '';
-                }
                 ieModal.style.display = 'flex';
             }
 
@@ -206,7 +154,8 @@
                     }
 
 
-                    // Build payload: only allow changing password (fullName is locked)
+                    // Build payload: allow changing password and fullName
+                    const fullName = document.getElementById('ieFullName').value || '';
                     const currentPwd = document.getElementById('ieCurrentPassword').value || '';
                     const newPwd = document.getElementById('ieNewPassword').value || '';
                     const confirmPwd = document.getElementById('ieConfirmPassword').value || '';
@@ -228,8 +177,14 @@
                     }
 
                     const payload = {};
+                    if (fullName && fullName.trim()) payload.fullName = fullName.trim();
                     if (newPwd) payload.password = newPwd;
-                    const avatarFile = document.getElementById('ieAvatarFile')?.files[0];
+
+                    // Check if there's anything to update
+                    if (Object.keys(payload).length === 0) {
+                        alert('Không có thay đổi để lưu');
+                        return;
+                    }
 
                     const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
                     const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
@@ -238,10 +193,7 @@
 
                     // Use /api/users/me so authenticated user can update own profile
                     const resp = await fetch(`/api/users/me`, {
-                        method: 'PUT', headers, body: JSON.stringify({
-                            ...payload,
-                            currentPassword: currentPwd || undefined
-                        })
+                        method: 'PUT', headers, body: JSON.stringify(payload)
                     });
 
                     const respBody = await resp.json().catch(()=>null);
@@ -258,29 +210,6 @@
                         document.getElementById('profileEmail').textContent = updated.email || document.getElementById('profileEmail').textContent;
                         document.getElementById('profileDepartment').textContent = updated.department || document.getElementById('profileDepartment').textContent;
                         document.getElementById('profileStatus').textContent = updated.status || document.getElementById('profileStatus').textContent;
-                    }
-
-                    // If avatar selected, attempt upload to /api/users/{id}/avatar (best-effort)
-                    if (avatarFile) {
-                        try {
-                            const fd = new FormData();
-                            fd.append('file', avatarFile);
-                            const authHeaders = {};
-                            if (token) authHeaders['Authorization'] = `${tokenType} ${token}`;
-                            const upResp = await fetch(`/api/users/${_currentProfile.id}/avatar`, {
-                                method: 'POST', headers: authHeaders, body: fd
-                            });
-                            if (!upResp.ok) {
-                                console.warn('Avatar upload failed', upResp.status);
-                            } else {
-                                const upBody = await upResp.json().catch(()=>null);
-                                if (upBody && upBody.url) {
-                                    document.getElementById('ieAvatarPreview').src = upBody.url;
-                                }
-                            }
-                        } catch (e) {
-                            console.warn('Error uploading avatar', e);
-                        }
                     }
 
                     ieModal.style.display = 'none';

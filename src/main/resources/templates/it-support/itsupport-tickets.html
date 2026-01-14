@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/it-support/close-panel.css">
 </head>
 <body>
     <!-- Header Component -->
@@ -37,6 +38,9 @@
             </div>
         </div>
     </header>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Sidebar Component -->
     <aside class="sidebar">
@@ -72,17 +76,6 @@
                             <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                         <span class="menu-text">My Tickets</span>
-                    </a>
-                </li>
-                
-                <li class="menu-item">
-                    <a href="/support/performance" class="menu-link" title="Performance">
-                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                        <span class="menu-text">Performance</span>
                     </a>
                 </li>
             </ul>
@@ -154,7 +147,6 @@
                             <th class="th-priority">Priority</th>
                             <th class="th-created">Created At</th>
                             <th class="th-status">Status</th>
-                            <th class="th-status-update">Update</th>
                             <th class="th-action">Action</th>
                         </tr>
                     </thead>
@@ -212,25 +204,60 @@
                 </div>
 
                 <div class="modal-right">
+                    <!-- Comments / Conversation Panel -->
+                    <div id="commentsPanel" class="panel comments-panel" style="display:flex; flex-direction:column; height:100%;">
+                        <h4 style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                            <span>Conversation</span>
+                        </h4>
+                        <div class="comments-list" style="flex:1; max-height:300px; overflow-y:auto; padding:8px; gap:8px; display:flex; flex-direction:column; border:1px solid #e0e0e0; border-radius:8px; background:#f9f9f9;">
+                            <div id="modalSupportComments"><p class="no-comments">No comments yet</p></div>
+                            <div id="modalEmployeeComments"><p class="no-comments">No comments yet</p></div>
+                        </div>
 
-                    <!-- Close Panel -->
-                    <div id="closePanel" class="panel close-panel" style="display:none;">
-                        <h4>Close Ticket</h4>
-                        <div class="close-row">
-                            <label>Ticket No.</label>
-                            <input type="text" id="closeTicketNo" readonly>
-                        </div>
-                        <div class="close-row">
-                            <label>Comment</label>
-                            <textarea id="closeComment" placeholder="Add closing comment..."></textarea>
-                        </div>
-                        <div class="close-row actions">
-                            <button class="btn-close-ticket" onclick="TicketsManager.closeTicketWithForm()">Close Ticket</button>
+                        <div class="comment-form" style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                            <textarea id="modalComment" placeholder="Viết tin nhắn..." style="min-height:80px; padding:10px; border-radius:8px; border:1px solid var(--border-color); resize:none;"></textarea>
+                            <div style="text-align:right;">
+                                <button class="btn-send" onclick="TicketsManager.sendComment()" style="background:var(--primary-color); color:#fff; border:none; padding:8px 14px; border-radius:8px; cursor:pointer;">Send</button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
             </div> 
+        </div>
+    </div>
+
+    <!-- Close Panel (pulled out so it can display standalone) -->
+    <div class="close-panel-backdrop" id="closePanelBackdrop" style="display:none;"></div>
+    <div id="closePanel" class="close-panel" aria-hidden="true" style="display:none;">
+        <h2>Close Ticket</h2>
+
+        <!-- Ticket identifier -->
+        <div class="close-form-row">
+            <div class="close-id-wrapper">
+                <span class="close-id-label">ID</span>
+                <input id="closeTicketId" class="close-ticket-id" readonly placeholder="Ticket ID">
+            </div>
+        </div>
+
+        <!-- Title & Description preview -->
+        <div class="close-form-row close-preview-row">
+            <div class="close-field">
+                <label>Title</label>
+                <div id="closeTitle" class="close-field-value">-</div>
+            </div>
+            <div class="close-field">
+                <label>Description</label>
+                <div id="closeDescription" class="close-field-value">-</div>
+            </div>
+        </div>
+
+        <div style="margin:12px 0; text-align:center; font-weight:700;">Comment by ITSupport</div>
+        <div>
+            <textarea id="closeComment" placeholder="Add closing comment..."></textarea>
+        </div>
+        <div class="close-actions">
+            <button class="btn-close-ticket" id="closeTicketBtn">Close Ticket</button>
         </div>
     </div>
 
@@ -258,21 +285,78 @@
                     this.fetchUsersForTeams().catch(() => {});
                     await this.fetchTickets(); },
             bindEvents() {
+                console.log('TicketsManager.bindEvents running');
                 const sidebar = document.querySelector('.sidebar');
                 const toggleBtn = document.querySelector('.sidebar-toggle');
                 const mainContent = document.querySelector('.main-content');
                 toggleBtn?.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); mainContent.classList.toggle('expanded'); });
                 const searchInput = document.getElementById('searchInput'); searchInput?.addEventListener('input', (e) => { this.state.searchTerm = e.target.value.toLowerCase(); this.state.currentPage = 1; this.filterAndRenderTickets(); });
                 const entriesSelect = document.getElementById('entriesSelect'); entriesSelect?.addEventListener('change', (e) => { this.state.entriesPerPage = parseInt(e.target.value); this.state.currentPage = 1; this.filterAndRenderTickets(); });
-                // team select change (close form)
-                document.getElementById('closeTeamSelect')?.addEventListener('change', () => this.onTeamChange());
+                // member select reload handled by populateMemberSelect
+                // delegated click for quick close buttons (robust when inline handlers fail)
+                const tableBody = document.getElementById('ticketsTableBody');
+                tableBody?.addEventListener('click', (e) => {
+                    const btn = e.target.closest && e.target.closest('.action-close');
+                    if (btn) {
+                        const row = btn.closest && btn.closest('.ticket-row');
+                        const id = row?.dataset?.id;
+                        if (id) {
+                            console.log('Delegated quickClose click for id=', id);
+                            this.quickClose(id);
+                        } else {
+                            console.warn('Could not find ticket id for quickClose');
+                        }
+                    }
+                });
+
+                // Fallback: global click listener in case table-specific listener doesn't attach
+                document.addEventListener('click', (e) => {
+                    const btn = e.target.closest && e.target.closest('.action-close');
+                    if (btn) {
+                        const row = btn.closest && btn.closest('.ticket-row');
+                        const id = row?.dataset?.id;
+                        if (id) {
+                            console.log('Global delegated quickClose click for id=', id);
+                            this.quickClose(id);
+                        }
+                    }
+                });
+
+                // Ensure overlay close button triggers the close flow
+                const closeBtn = document.getElementById('closeTicketBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', (ev) => { ev.preventDefault(); this.closeTicketWithForm(); });
+                }
                 const logoutBtn = document.querySelector('.btn-logout'); logoutBtn?.addEventListener('click', () => { AuthManager.logout(); });
+                // backdrop click to dismiss close overlay
+                const backdrop = document.getElementById('closePanelBackdrop');
+                backdrop?.addEventListener('click', () => {
+                    const panel = document.getElementById('closePanel');
+                    if (panel) panel.style.display = 'none';
+                    backdrop.style.display = 'none';
+                });
+            },
+
+            showToast(message, type = 'info', timeout = 3200) {
+                const container = document.getElementById('toastContainer');
+                if (!container) { try { window.alert(message); } catch { /* ignore */ } return; }
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type} toast-show`;
+                toast.textContent = message;
+                container.appendChild(toast);
+                // auto hide
+                setTimeout(() => {
+                    toast.classList.remove('toast-show');
+                    toast.classList.add('toast-hide');
+                    setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 300);
+                }, timeout);
             },
             async fetchTickets() {
                 this.showLoading();
                 const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
                 try {
-                    const response = await fetch(this.API_BASE_URL, { method: 'GET', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader } });
+                    // IT Support users: fetch only tickets assigned to them via /api/tickets/my
+                    const response = await fetch(`${this.API_BASE_URL}/my`, { method: 'GET', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader } });
                     if (response.status === 401) { AuthManager.logout(); return; }
                     if (response.status === 403) { throw new Error('You do not have permission to view tickets'); }
                     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
@@ -293,25 +377,10 @@
                         <td class="td-status">
                             <span class="status-badge ${statusClass}" id="statusBadge-${ticket.id}">${this.formatStatus(status)}</span>
                         </td>
-                        <td class="td-status-update">
-                            <select id="statusSelect-${ticket.id}" class="status-select" onchange="TicketsManager.onStatusChange('${ticket.id}', this)" aria-label="Update status">
-                                <option value="OPEN" ${status === 'OPEN' ? 'selected' : ''}>${this.formatStatus('OPEN')}</option>
-                                <option value="ASSIGNED" ${status === 'ASSIGNED' ? 'selected' : ''}>${this.formatStatus('ASSIGNED')}</option>
-                                <option value="IN_PROGRESS" ${status === 'IN_PROGRESS' ? 'selected' : ''}>${this.formatStatus('IN_PROGRESS')}</option>
-                                <option value="RESOLVED" ${status === 'RESOLVED' ? 'selected' : ''}>${this.formatStatus('RESOLVED')}</option>
-                                <option value="CLOSED" ${status === 'CLOSED' ? 'selected' : ''}>${this.formatStatus('CLOSED')}</option>
-                            </select>
-                        </td>
+                        
                         <td class="td-action">
                             <div class="action-buttons">
-                                <button class="action-btn" title="Assign User" onclick="TicketsManager.assignTicket('${ticket.id}')" aria-label="Assign">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <line x1="19" y1="8" x2="19" y2="14"></line>
-                                        <line x1="22" y1="11" x2="16" y2="11"></line>
-                                    </svg>
-                                </button>
+                                
                                 <button class="action-btn" title="More Info" onclick="TicketsManager.showMoreInfo('${ticket.id}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
@@ -362,137 +431,181 @@
             showError(message) { document.getElementById('loadingState').style.display = 'none'; document.getElementById('tableWrapper').style.display = 'none'; document.getElementById('emptyState').style.display = 'none'; document.getElementById('errorState').style.display = 'flex'; document.getElementById('errorMessage').textContent = message || 'Failed to load tickets'; document.getElementById('paginationWrapper').style.display = 'none'; },
             hideError() { document.getElementById('errorState').style.display = 'none'; },
             viewTicket(id) { /* Show details when clicking view */ this.showMoreInfo(id); },
-            async assignTicket(id) {
-                console.log('TicketsManager.assignTicket called', id);
-                // open assign modal (separate from ticket details)
-                this._assigningId = id;
-                // show ticket title in modal if available
-                const ticket = this.state.tickets.find(t => t.id === id);
-                const titleEl = document.getElementById('assignTicketTitle');
-                if (titleEl) titleEl.textContent = ticket ? (ticket.title || ticket.id) : id;
-                // ensure we have up-to-date IT support users
-                await this.fetchITSupportUsers();
-                this.populateAssignSelect();
-                const modal = document.getElementById('assignModal');
-                if (modal) modal.style.display = 'flex';
-                const select = document.getElementById('assignUserSelect');
-                if (select) select.focus();
-            },
-            async assignTicketWithForm() {
-                const id = this._assigningId || this._currentDetailId;
-                if (!id) return alert('No ticket selected to assign');
-                const assigneeId = document.getElementById('closeMemberSelect')?.value;
-                if (!assigneeId) return alert('Please select a team member to assign');
-                if (!confirm('Bạn có chắc chắn muốn gán ticket này cho thành viên đã chọn?')) return;
-                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
-                try {
-                    const res = await fetch(`${this.API_BASE_URL}/${id}/assign`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
-                        body: JSON.stringify({ assigneeId })
-                    });
-                    if (res.status === 401) { AuthManager.logout(); return; }
-                    if (res.status === 403) { throw new Error('Bạn không có quyền gán ticket'); }
-                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Assign failed'); }
-                    const body = await res.json(); const updated = body && body.data ? body.data : body;
-                    // update local ticket state and UI
-                    const ticket = this.state.tickets.find(t => t.id === id);
-                    if (ticket) {
-                        ticket.assignedTo = updated.assignedTo || ticket.assignedTo;
-                        ticket.status = updated.status || ticket.status;
-                    }
-                    // refresh list and modal
-                    await this.fetchTickets();
-                    alert('Ticket assigned successfully');
-                    // clear assign state and close modal
-                    this._assigningId = null; this.closeTicketModal();
-                } catch (err) {
-                    console.error('Assign failed:', err);
-                    alert('Assign failed: ' + (err.message || err));
-                }
-            },
-            async onStatusChange(id, selectEl) {
-                const newStatus = selectEl?.value;
-                const ticket = this.state.tickets.find(t => t.id === id);
-                const prevStatus = ticket?.status;
-                if (!newStatus || newStatus === prevStatus) return;
-                selectEl.disabled = true;
-                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
-                try {
-                    const res = await fetch(`${this.API_BASE_URL}/${id}/status`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
-                        body: JSON.stringify({ status: newStatus })
-                    });
-                    if (res.status === 401) { AuthManager.logout(); return; }
-                    if (res.status === 403) { throw new Error('You do not have permission to update status'); }
-                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Failed to update status'); }
-                    const body = await res.json();
-                    const updated = body && body.data ? body.data : body;
-                    if (ticket) {
-                        ticket.status = updated.status || newStatus;
-                        const badge = document.getElementById(`statusBadge-${id}`);
-                        if (badge) { badge.textContent = this.formatStatus(ticket.status); badge.className = `status-badge ${this.getStatusClass(ticket.status)}`; }
-                        if (this._currentDetailId === id) { document.getElementById('detailStatus').textContent = this.formatStatus(ticket.status); }
-                    }
-                    this.filterAndRenderTickets();
-                } catch (err) {
-                    console.error('Error updating ticket status:', err);
-                    alert(err.message || 'Failed to update status');
-                    if (selectEl) selectEl.value = prevStatus || 'OPEN';
-                } finally { if (selectEl) selectEl.disabled = false; }
-            },
+            
+            
+            
             async showMoreInfo(id, panel = null) {
                 console.log('TicketsManager.showMoreInfo called', id, panel);
-                const ticket = this.state.tickets.find(t => t.id === id);
-                if (!ticket) return;
+                // Load detailed ticket from API to ensure comments are included
+                const authHeader = AuthManager.getAuthHeader();
+                try {
+                    const res = await fetch(`${this.API_BASE_URL}/${id}`, { headers: { 'Accept': 'application/json', 'Authorization': authHeader } });
+                    if (res.status === 401) { AuthManager.logout(); return; }
+                    if (!res.ok) { console.warn('Failed to fetch ticket details', res.status); return; }
+                    const body = await res.json();
+                    const ticket = body && (body.data || body);
+                    if (!ticket) return;
 
-                document.getElementById('detailTicketNo').textContent = ticket.id || '';
-                document.getElementById('detailDate').textContent = this.formatDateTime(ticket.createdAt);
-                document.getElementById('detailName').textContent = ticket.createdBy?.fullName || ticket.createdBy?.username || '';
-                document.getElementById('detailDept').textContent = ticket.createdBy?.department || '';
-                document.getElementById('detailTitle').textContent = ticket.title || '';
-                document.getElementById('detailDescription').textContent = ticket.description || '';
-                document.getElementById('detailCategory').textContent = ticket.category || '';
-                document.getElementById('detailPriority').textContent = ticket.priority || '';
-                document.getElementById('detailStatus').textContent = this.formatStatus(ticket.status);
-                document.getElementById('detailCreatedBy').textContent = ticket.createdBy?.fullName || ticket.createdBy?.username || 'User';
-                document.getElementById('detailAssignedTo').textContent = ticket.assignedTo?.fullName || ticket.assignedTo?.username || 'Unassigned';
+                    document.getElementById('detailTicketNo').textContent = ticket.id || '';
+                    document.getElementById('detailDate').textContent = this.formatDateTime(ticket.createdAt);
+                    document.getElementById('detailName').textContent = ticket.createdBy?.fullName || ticket.createdBy?.username || '';
+                    document.getElementById('detailDept').textContent = ticket.createdBy?.department || '';
+                    document.getElementById('detailTitle').textContent = ticket.title || '';
+                    document.getElementById('detailDescription').textContent = ticket.description || '';
+                    document.getElementById('detailCategory').textContent = ticket.category || '';
+                    document.getElementById('detailPriority').textContent = ticket.priority || '';
+                    document.getElementById('detailStatus').textContent = this.formatStatus(ticket.status);
+                    document.getElementById('detailCreatedBy').textContent = ticket.createdBy?.fullName || ticket.createdBy?.username || 'User';
+                    document.getElementById('detailAssignedTo').textContent = ticket.assignedTo?.fullName || ticket.assignedTo?.username || 'Unassigned';
 
-                // store current id for update
-                this._currentDetailId = id;
+                    // store current id for update
+                    this._currentDetailId = id;
 
-                // populate close form fields
-                const closeNo = document.getElementById('closeTicketNo');
-                if (closeNo) closeNo.value = ticket.id || '';
-                const commentEl = document.getElementById('closeComment');
-                if (commentEl) commentEl.value = '';
-
-                // If closing panel requested, load teams/users and populate selects
-                if (panel === 'close') {
-                    await this.fetchUsersForTeams();
-                    const preferredDept = ticket.assignedTo?.department || ticket.createdBy?.department || '';
-                    this.populateTeamSelect(preferredDept);
-                    const memberSelect = document.getElementById('closeMemberSelect');
-                    if (memberSelect && ticket.assignedTo && ticket.assignedTo.id) {
-                        memberSelect.value = ticket.assignedTo.id;
+                    // populate close form fields
+                    const closeTicketInput = document.getElementById('closeTicketId');
+                    if (closeTicketInput) {
+                        try { closeTicketInput.value = ticket.id || ''; } catch(e) { /* ignore */ }
                     }
+                    const closeTitleEl = document.getElementById('closeTitle');
+                    if (closeTitleEl) closeTitleEl.textContent = ticket.title || '-';
+                    const closeDescEl = document.getElementById('closeDescription');
+                    if (closeDescEl) closeDescEl.textContent = ticket.description || '-';
+                    const commentEl = document.getElementById('closeComment');
+                    if (commentEl) commentEl.value = '';
+
+                    // If closing panel requested, load teams/users and populate selects
+                    // No member/team selects for close panel (simplified flow)
+
+                    // show/hide panels based on requested action (assign handled by separate modal)
+                    const closePanel = document.getElementById('closePanel');
+                    const closeBackdrop = document.getElementById('closePanelBackdrop');
+                    if (closePanel) {
+                        const show = panel === 'close';
+                        closePanel.style.display = show ? 'block' : 'none';
+                        closePanel.setAttribute('aria-hidden', show ? 'false' : 'true');
+                    }
+                    if (closeBackdrop) closeBackdrop.style.display = (panel === 'close') ? 'block' : 'none';
+                    // Ensure modal overlay and right panel are visible. If opening only close panel, hide left side.
+                    const modalRight = document.querySelector('.modal-right');
+                    const modalLeft = document.querySelector('.modal-left');
+                    const detailsModal = document.getElementById('ticketDetailsModal');
+                    if (panel === 'close') {
+                        // hide the main details modal and show standalone close panel (backdrop handled above)
+                        if (detailsModal) detailsModal.style.display = 'none';
+                    } else {
+                        // show full details modal
+                        if (modalRight) modalRight.style.display = 'block';
+                        if (modalLeft) modalLeft.style.display = 'block';
+                        if (detailsModal) detailsModal.style.display = 'flex';
+                    }
+
+                    // load comments for this ticket (if present)
+                    try { await this.loadComments(ticket.comments || []); } catch (e) { console.warn('loadComments failed', e); }
+                } catch (err) {
+                    console.error('Error fetching ticket details:', err);
                 }
-
-                // show/hide panels based on requested action (assign handled by separate modal)
-                const closePanel = document.getElementById('closePanel');
-                if (closePanel) closePanel.style.display = (panel === 'close') ? 'block' : 'none';
-                const modalRight = document.querySelector('.modal-right');
-                if (modalRight) modalRight.style.display = (panel === 'close') ? 'block' : 'none';
-
-                // show modal
-                const detailsModal = document.getElementById('ticketDetailsModal');
-                if (detailsModal) detailsModal.style.display = 'flex';
             },
             closeTicketModal() {
                 document.getElementById('ticketDetailsModal').style.display = 'none';
                 this._currentDetailId = null;
                 this._assigningId = null;
+                const closePanel = document.getElementById('closePanel');
+                const closeBackdrop = document.getElementById('closePanelBackdrop');
+                if (closePanel) closePanel.style.display = 'none';
+                if (closeBackdrop) closeBackdrop.style.display = 'none';
+            },
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+
+            async loadComments(comments) {
+                try {
+                    const employeeComments = [];
+                    const supportComments = [];
+                    (comments || []).forEach(comment => {
+                        const roles = (comment.user && comment.user.roles) || [];
+                        const isSupport = Array.isArray(roles) ? roles.some(r => String(r).toUpperCase().includes('IT') || String(r).toUpperCase().includes('ADMIN')) : false;
+                        if (isSupport) supportComments.push(comment); else employeeComments.push(comment);
+                    });
+
+                    // Show only the most recent comment for each side to remove history from UI
+                    const latestEmployee = employeeComments.length > 0 ? [employeeComments[0]] : [];
+                    const latestSupport = supportComments.length > 0 ? [supportComments[0]] : [];
+
+                    const empEl = document.getElementById('modalEmployeeComments');
+                    const supEl = document.getElementById('modalSupportComments');
+
+                    if (empEl) {
+                        if (latestEmployee.length === 0) empEl.innerHTML = '<p class="no-comments">No comments yet</p>'; else empEl.innerHTML = latestEmployee.map(c => `
+                            <div class="comment-item">
+                                <div class="comment-header"><strong>${c.user?.fullName || c.user?.username || 'User'}</strong>
+                                    <span class="comment-time">${this.formatDateTime(c.createdAt)}</span></div>
+                                <p class="comment-text">${this.escapeHtml(c.content)}</p>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (supEl) {
+                        if (latestSupport.length === 0) supEl.innerHTML = '<p class="no-comments">No comments yet</p>'; else supEl.innerHTML = latestSupport.map(c => `
+                            <div class="comment-item">
+                                <div class="comment-header"><strong>${c.user?.fullName || 'Support'}</strong>
+                                    <span class="comment-time">${this.formatDateTime(c.createdAt)}</span></div>
+                                <p class="comment-text">${this.escapeHtml(c.content)}</p>
+                            </div>
+                        `).join('');
+                    }
+                } catch (err) {
+                    console.error('Error loading comments:', err);
+                }
+            },
+
+            async sendComment() {
+                const commentInput = document.getElementById('modalComment');
+                const content = commentInput?.value?.trim();
+                if (!content) return this.showToast('Vui lòng nhập comment', 'error');
+                const ticketId = this._currentDetailId || document.getElementById('detailTicketNo')?.textContent || document.getElementById('detailTicketNo')?.innerText || document.getElementById('detailTicketNo')?.value;
+                if (!ticketId) return this.showToast('Ticket ID not found', 'error');
+                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
+                try {
+                    const res = await fetch(`${this.API_BASE_URL}/${ticketId}/comments`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
+                        body: JSON.stringify({ content })
+                    });
+                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Failed to post comment'); }
+                    commentInput.value = '';
+                    // reload latest ticket to refresh comments
+                    const ticketRes = await fetch(`${this.API_BASE_URL}/${ticketId}`, { headers: { 'Accept': 'application/json', 'Authorization': authHeader } });
+                    if (ticketRes.ok) {
+                        const body = await ticketRes.json(); const ticket = body && (body.data || body);
+                        await this.loadComments(ticket.comments || []);
+                    }
+                } catch (err) {
+                    console.error('Error sending comment:', err);
+                    this.showToast('Không thể gửi comment', 'error');
+                }
+            },
+
+            async deleteCommentsForCurrentTicket() {
+                const ticketId = this._currentDetailId || document.getElementById('detailTicketNo')?.textContent;
+                if (!ticketId) return this.showToast('Ticket ID not found', 'error');
+                if (!confirm('Bạn có chắc chắn muốn xoá toàn bộ lịch sử comment cho ticket này?')) return;
+                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
+                try {
+                    const res = await fetch(`${this.API_BASE_URL}/${ticketId}/comments`, { method: 'DELETE', headers: { 'Accept': 'application/json', 'Authorization': authHeader } });
+                    if (res.status === 401) { AuthManager.logout(); return; }
+                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Failed to delete comments'); }
+                    this.showToast('All comments deleted for this ticket', 'success');
+                    // reload ticket details
+                    const ticketRes = await fetch(`${this.API_BASE_URL}/${ticketId}`, { headers: { 'Accept': 'application/json', 'Authorization': authHeader } });
+                    if (ticketRes.ok) { const body = await ticketRes.json(); const ticket = body && (body.data || body); await this.loadComments(ticket.comments || []); }
+                } catch (err) {
+                    console.error('Delete comments failed:', err);
+                    this.showToast('Xoá comment thất bại: ' + (err.message || err), 'error');
+                }
             },
             async updateTicket() {
                 if (!this._currentDetailId) return;
@@ -561,152 +674,49 @@
                 return users;
             },
 
-            populateAssignSelect() {
-                const select = document.getElementById('assignUserSelect');
-                const submitBtn = document.getElementById('assignSubmitBtn');
-                if (!select) return;
-                select.innerHTML = '';
-                const users = this._itSupportUsers || [];
-                if (users.length === 0) {
-                    select.innerHTML = '<option value="">No IT support users</option>';
-                    if (submitBtn) submitBtn.disabled = true;
-                    return;
-                }
-                users.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.textContent = u.fullName || u.username || u.email || 'Unknown';
-                    select.appendChild(opt);
-                });
-                // default to first user and focus
-                if (users.length > 0) {
-                    select.value = users[0].id;
-                    select.selectedIndex = 0;
-                    select.focus();
-                }
-                if (submitBtn) submitBtn.disabled = false;
-            },
+            
 
-            async submitAssign() {
-                const id = this._assigningId;
-                if (!id) return alert('No ticket selected to assign');
-                const assigneeId = document.getElementById('assignUserSelect')?.value;
-                if (!assigneeId) return alert('Please select a user to assign');
-                if (!confirm('Bạn có chắc chắn muốn gán ticket này cho thành viên đã chọn?')) return;
-                const authHeader = AuthManager.getAuthHeader(); if (!authHeader) { AuthManager.logout(); return; }
-                try {
-                    const res = await fetch(`${this.API_BASE_URL}/${id}/assign`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
-                        body: JSON.stringify({ assigneeId })
-                    });
-                    if (res.status === 401) { AuthManager.logout(); return; }
-                    if (res.status === 403) { throw new Error('Bạn không có quyền gán ticket'); }
-                    if (!res.ok) { const txt = await res.text(); throw new Error(txt || 'Assign failed'); }
-                    const body = await res.json(); const updated = body && body.data ? body.data : body;
-                    const ticket = this.state.tickets.find(t => t.id === id);
-                    if (ticket) {
-                        ticket.assignedTo = updated.assignedTo || ticket.assignedTo;
-                        ticket.status = updated.status || ticket.status;
-                    }
-                    await this.fetchTickets();
-                    alert('Ticket assigned successfully');
-                    this.closeAssignModal();
-                    this._assigningId = null;
-                } catch (err) {
-                    console.error('Assign failed:', err);
-                    alert('Assign failed: ' + (err.message || err));
-                }
-            },
+            
 
-            closeAssignModal() {
-                const modal = document.getElementById('assignModal');
-                if (modal) modal.style.display = 'none';
-                this._assigningId = null;
-            },
+            
 
-            populateTeamSelect(selectedDept) {
-                const teamSelect = document.getElementById('closeTeamSelect');
-                const memberSelect = document.getElementById('closeMemberSelect');
-                teamSelect.innerHTML = '';
-                const depts = Object.keys(this._teamsMap || {});
-                if (depts.length === 0) {
-                    teamSelect.innerHTML = '<option value="">No teams</option>';
-                    memberSelect.innerHTML = '<option value="">No members</option>';
-                    return;
-                }
-                depts.forEach(dept => {
-                    const opt = document.createElement('option');
-                    opt.value = dept;
-                    opt.textContent = dept;
-                    teamSelect.appendChild(opt);
-                });
-                if (selectedDept && depts.includes(selectedDept)) teamSelect.value = selectedDept;
-                this.onTeamChange();
-
-                // hook reload button
-                document.getElementById('reloadTeamsBtn')?.addEventListener('click', async () => {
-                    await this.fetchUsersForTeams(true);
-                    this.populateTeamSelect(teamSelect.value);
-                });
-            },
-
-            onTeamChange() {
-                const teamSelect = document.getElementById('closeTeamSelect');
-                const memberSelect = document.getElementById('closeMemberSelect');
-                memberSelect.innerHTML = '';
-                const users = (this._teamsMap && this._teamsMap[teamSelect.value]) || [];
-                if (users.length === 0) {
-                    memberSelect.innerHTML = '<option value="">No members</option>';
-                    return;
-                }
-                users.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.textContent = u.fullName || u.username;
-                    memberSelect.appendChild(opt);
-                });
-            },
+            // populateMemberSelect removed - close panel no longer supports assigning members
 
             async quickClose(id) {
-                // Quick close: show modal, set a quick comment and execute close flow
+                // Quick close: immediately show overlay and prefill a quick comment (don't rely on backend fetch)
                 try {
-                    this.showMoreInfo(id, 'close');
-                    // give the modal a bit more time to render so user can see it
-                    await new Promise(r => setTimeout(r, 350));
+                    console.log('quickClose called for id=', id);
+                    this._currentDetailId = id;
+                    // show overlay/backdrop immediately
+                    const closePanel = document.getElementById('closePanel');
+                    const closeBackdrop = document.getElementById('closePanelBackdrop');
+                    if (closePanel) { closePanel.style.display = 'block'; closePanel.setAttribute('aria-hidden', 'false'); }
+                    if (closeBackdrop) closeBackdrop.style.display = 'block';
+
+                    // populate ticket id input and prefill comment
+                    const closeTicketInput = document.getElementById('closeTicketId');
+                    if (closeTicketInput) { try { closeTicketInput.value = id || ''; } catch(e) {} }
                     const commentEl = document.getElementById('closeComment');
-                    if (commentEl) commentEl.value = 'Closed quickly by IT Support';
-                    await this.closeTicketWithForm();
+                    if (commentEl) { commentEl.value = 'Closed quickly by IT Support'; commentEl.focus(); }
+
+                    // also attempt to load full ticket details in background to refresh comments/assigned info
+                    this.showMoreInfo(id, 'close').catch(e => console.warn('showMoreInfo background load failed', e));
                 } catch (err) {
                     console.error('quickClose failed:', err);
-                    alert('Quick close failed: ' + (err.message || err));
+                    this.showToast('Quick close failed: ' + (err.message || err), 'error');
                 }
             },
 
 
             async closeTicketWithForm() {
                 if (!this._currentDetailId) return;
-                if (!confirm('Bạn có chắc chắn muốn đóng ticket này?')) return;
 
                 const ticketId = this._currentDetailId;
-                const assigneeId = document.getElementById('closeMemberSelect')?.value;
                 const comment = document.getElementById('closeComment')?.value || '';
                 const authHeader = AuthManager.getAuthHeader();
                 if (!authHeader) { AuthManager.logout(); return; }
 
                 try {
-                    // If assignee chosen, assign first
-                    if (assigneeId) {
-                        try {
-                            await fetch(`${this.API_BASE_URL}/${ticketId}/assign`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': authHeader },
-                                body: JSON.stringify({ assigneeId })
-                            });
-                        } catch (err) {
-                            console.warn('Assign request failed (non-fatal):', err);
-                        }
-                    }
 
                     // Post comment if provided
                     if (comment.trim()) {
@@ -724,12 +734,12 @@
                         body: JSON.stringify({ status: 'CLOSED' })
                     }).then(r => { if (!r.ok) throw new Error('Close failed'); });
 
-                    alert('Ticket closed successfully');
+                    this.showToast('Ticket closed successfully', 'success');
                     await this.fetchTickets();
                     this.closeTicketModal();
                 } catch (err) {
                     console.error('Error in closeTicketWithForm:', err);
-                    alert('Error closing ticket: ' + (err.message || err));
+                    this.showToast('Error closing ticket: ' + (err.message || err), 'error');
                 }
             }
         };
@@ -739,22 +749,6 @@
         document.addEventListener('DOMContentLoaded', () => { TicketsManager.init(); window.TicketsManager = TicketsManager; });
     </script>
 
-    <!-- Assign Modal (standalone) -->
-    <div id="assignModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content">
-            <h3 class="modal-title">Assign Ticket: <span id="assignTicketTitle"></span></h3>
-            <button class="modal-close" aria-label="Close" onclick="TicketsManager.closeAssignModal()">×</button>
-            <div class="modal-body">
-                <div class="assign-row">
-                    <label for="assignUserSelect">Assign to</label>
-                    <select id="assignUserSelect" style="width:100%; padding:6px 8px; margin-top:6px;"></select>
-                </div>
-                <div class="modal-actions" style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
-                    <button id="assignSubmitBtn" class="btn-primary" onclick="TicketsManager.submitAssign()" disabled>Assign</button>
-                    <button class="btn-secondary" onclick="TicketsManager.closeAssignModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 </body>
 </html>

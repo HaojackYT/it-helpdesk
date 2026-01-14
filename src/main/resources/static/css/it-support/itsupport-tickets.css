@@ -202,8 +202,7 @@ body {
 .status-open { background-color: var(--status-open); color: #ffffff; }
 .status-progress { background-color: var(--status-progress); color: #000000; }
 
-/* Status Select Column */
-.th-status-update, .td-status-update { width: 140px; }
+/* Status Select Column (removed) */
 .status-select { height: 36px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer; outline: none; }
 .status-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(78,205,196,0.06); }
 
