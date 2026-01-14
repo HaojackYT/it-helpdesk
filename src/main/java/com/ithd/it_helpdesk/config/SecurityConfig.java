@@ -77,7 +77,7 @@ public class SecurityConfig {
                 
                 // Ticket Management
                 .requestMatchers(HttpMethod.POST, "/api/tickets").hasAuthority("TICKET_CREATE")
-                .requestMatchers(HttpMethod.GET, "/api/tickets/my").hasAuthority("TICKET_VIEW_OWN")
+                .requestMatchers(HttpMethod.GET, "/api/tickets/my").hasAnyAuthority("TICKET_VIEW_OWN", "TICKET_VIEW_ALL")
                 .requestMatchers(HttpMethod.GET, "/api/tickets").hasAuthority("TICKET_VIEW_ALL")
                 .requestMatchers(HttpMethod.PUT, "/api/tickets/{id}/assign").hasAuthority("TICKET_ASSIGN")
                 .requestMatchers(HttpMethod.PUT, "/api/tickets/{id}/status").hasAuthority("TICKET_UPDATE_STATUS")
