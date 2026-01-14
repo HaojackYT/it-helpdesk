@@ -1,8 +1,10 @@
 package com.ithd.it_helpdesk.controller;
 
 import com.ithd.it_helpdesk.dto.request.LoginRequest;
+import com.ithd.it_helpdesk.dto.request.RegisterRequest;
 import com.ithd.it_helpdesk.dto.response.ApiResponse;
 import com.ithd.it_helpdesk.dto.response.LoginResponse;
+import com.ithd.it_helpdesk.dto.response.RegisterResponse;
 import com.ithd.it_helpdesk.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        RegisterResponse response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.success("Registration successful", response));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {

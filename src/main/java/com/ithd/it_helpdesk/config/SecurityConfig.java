@@ -52,10 +52,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
                 .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/error").permitAll()
                 
                 // Static resources & Login page
-                .requestMatchers("/", "/login", "/login.html").permitAll()
+                .requestMatchers("/", "/login", "/login.html", "/signup", "/signup.html").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/static/**").permitAll()
                 
                 // Dashboard pages - allow access (authorization handled by frontend)
