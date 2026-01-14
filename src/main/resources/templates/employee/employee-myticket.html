@@ -767,15 +767,49 @@
                 // Fetch and display comments
                 await this.loadComments(ticket.comments || []);
                 
+                // Mark modal with ticket status so other actions can check it
+                const modal = document.getElementById('ticketModal');
+                if (modal) modal.dataset.ticketStatus = ticket.status || '';
+
                 // Toggle comment section visibility based on mode
                 const commentSection = document.querySelector('.modal-section:has(#modalComment)');
                 const sendButton = document.querySelector('.btn-send');
-                
+                const commentInput = document.getElementById('modalComment');
+
+                // Treat tickets with status 'CLOSED' as non-commentable
+                const statusValue = (ticket.status || '').toString().toLowerCase();
+                const isClosed = statusValue.includes('closed');
+
                 if (commentSection) {
                     commentSection.style.display = isEditable ? 'block' : 'none';
                 }
                 if (sendButton) {
                     sendButton.style.display = isEditable ? 'inline-flex' : 'none';
+                }
+
+                // If ticket is closed/resolved, disable the input and button and update placeholder/title
+                if (commentInput) {
+                    if (isClosed) {
+                        commentInput.disabled = true;
+                        commentInput.placeholder = 'Cannot add comments to closed tickets.';
+                        commentInput.title = 'Ticket closed - commenting disabled';
+                    } else {
+                        commentInput.disabled = false;
+                        commentInput.placeholder = 'Add your comment here...';
+                        commentInput.title = '';
+                    }
+                }
+
+                if (sendButton) {
+                    if (isClosed) {
+                        sendButton.disabled = true;
+                        sendButton.style.opacity = '0.6';
+                        sendButton.title = 'Cannot comment on closed ticket';
+                    } else {
+                        sendButton.disabled = false;
+                        sendButton.style.opacity = '';
+                        sendButton.title = '';
+                    }
                 }
             },
             
@@ -845,26 +879,35 @@
             async sendComment() {
                 const commentInput = document.getElementById('modalComment');
                 const comment = commentInput?.value?.trim();
-                
+
+                // Prevent commenting if ticket is closed/resolved
+                const modal = document.getElementById('ticketModal');
+                const statusValue = (modal?.dataset?.ticketStatus || '').toString().toLowerCase();
+                const isClosed = statusValue.includes('closed') || statusValue.includes('resolved');
+                if (isClosed) {
+                    alert('Không thể bình luận trên ticket đã đóng hoặc đã được giải quyết.');
+                    return;
+                }
+
                 if (!comment) {
                     alert('Vui lòng nhập comment');
                     return;
                 }
-                
+
                 try {
                     const ticketId = document.getElementById('modalTicketNo').textContent;
-                    
+
                     // Call API to add comment
                     const response = await fetch(`/api/tickets/${ticketId}/comments`, {
                         method: 'POST',
                         headers: API.getHeaders(),
                         body: JSON.stringify({ content: comment })
                     });
-                    
+
                     if (response.ok) {
                         alert('Comment đã được gửi!');
                         commentInput.value = '';
-                        
+
                         // Reload ticket details to get fresh comments
                         const ticketResponse = await API.get(`/tickets/${ticketId}`);
                         await this.loadComments(ticketResponse.data.comments || []);
