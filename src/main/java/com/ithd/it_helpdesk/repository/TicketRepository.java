@@ -28,6 +28,7 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     @Query("SELECT t FROM Ticket t WHERE t.assignedTo.id = :userId")
     List<Ticket> findByAssignedToId(@Param("userId") UUID userId);
     
+    
     @Query("SELECT t.status, COUNT(t) FROM Ticket t GROUP BY t.status")
     List<Object[]> countByStatus();
     
