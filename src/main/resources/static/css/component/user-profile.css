@@ -10,6 +10,7 @@
 }
 
 .user-profile-card {
+    position: relative;
     width: 520px;
     background: #fff;
     border-radius: 12px;
@@ -74,19 +75,19 @@
     .user-profile-card { width: 92%; }
 }
 
-/* Inline edit modal styles (used by user-profile fragment) */
-.modal-overlay {
-    position: absolute; /* inside the profile fragment */
+/* Inline edit modal styles (used by user-profile fragment) - Use ID for higher specificity */
+#inlineEditUserModal {
+    position: fixed !important;
     inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
     background: rgba(0,0,0,0.45);
-    z-index: 2500;
+    z-index: 2500 !important;
 }
 
-.modal-container {
-    width: 360px;
+#inlineEditUserModal .modal-container {
+    width: 450px;
     max-width: 92%;
     background: #ffffff;
     border-radius: 10px;
@@ -95,7 +96,7 @@
     padding: 0;
 }
 
-.modal-header {
+#inlineEditUserModal .modal-header {
     background: linear-gradient(90deg,#3ec9b0,#3aa79a);
     color: #fff;
     padding: 12px 14px;
@@ -104,14 +105,27 @@
     justify-content: space-between;
 }
 
-.modal-header h3 { margin: 0; font-size: 16px; }
-.modal-close { background: transparent; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+#inlineEditUserModal .modal-header h3 { margin: 0; font-size: 16px; }
+#inlineEditUserModal .modal-close { background: transparent; border: none; color: #fff; font-size: 20px; cursor: pointer; position: static; }
 
-.modal-body { padding: 12px 14px 16px 14px; }
-.form-row { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
-.form-row label { font-size:13px; color:#333; font-weight:600; }
-.form-row input, .form-row select { padding:8px 10px; border-radius:6px; border:1px solid #ddd; width:100%; box-sizing:border-box; }
-.modal-body button[type="submit"] { background:#3ec9b0; color:#fff; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; }
+#inlineEditUserModal .modal-body { 
+    padding: 16px 20px 20px 20px; 
+    display: block !important;
+    flex-direction: column;
+}
+#inlineEditUserModal .form-row { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+#inlineEditUserModal .form-row label { font-size:13px; color:#333; font-weight:600; }
+#inlineEditUserModal .form-row input { 
+    padding: 10px 12px; 
+    border-radius: 6px; 
+    border: 1px solid #ddd; 
+    width: 100%; 
+    box-sizing: border-box; 
+    font-size: 14px; 
+}
+#inlineEditUserModal .form-row input:focus { outline: none; border-color: #3ec9b0; box-shadow: 0 0 0 2px rgba(62,201,176,0.2); }
+#inlineEditUserModal .modal-body button[type="submit"] { background:#3ec9b0; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size: 14px; font-weight: 600; }
+#inlineEditUserModal .modal-body button[type="submit"]:hover { background:#35b59e; }
 
 @media (max-width:420px) {
     .modal-container { width: 300px; }

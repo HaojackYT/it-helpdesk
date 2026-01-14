@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/it-support/itsupport-sidebar.css">
     <link rel="stylesheet" href="/css/it-support/itsupport-tickets.css">
+    <link rel="stylesheet" href="/css/component/user-profile.css">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -328,6 +329,16 @@
                     closeBtn.addEventListener('click', (ev) => { ev.preventDefault(); this.closeTicketWithForm(); });
                 }
                 const logoutBtn = document.querySelector('.btn-logout'); logoutBtn?.addEventListener('click', () => { AuthManager.logout(); });
+                // User profile button
+                const userBtn = document.querySelector('.btn-user');
+                userBtn?.addEventListener('click', () => {
+                    if (typeof showUserProfileModal === 'function') {
+                        showUserProfileModal();
+                    } else {
+                        const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+                        alert(`User Profile\n\nUsername: ${user.username || 'N/A'}\nFull Name: ${user.fullName || 'N/A'}\nEmail: ${user.email || 'N/A'}`);
+                    }
+                });
                 // backdrop click to dismiss close overlay
                 const backdrop = document.getElementById('closePanelBackdrop');
                 backdrop?.addEventListener('click', () => {
@@ -749,6 +760,8 @@
         document.addEventListener('DOMContentLoaded', () => { TicketsManager.init(); window.TicketsManager = TicketsManager; });
     </script>
 
+    <!-- Insert user profile modal component -->
+    <div th:insert="component/user-profile :: userProfile"></div>
     
 </body>
 </html>
