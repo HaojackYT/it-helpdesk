@@ -35,7 +35,23 @@ public class TicketService {
 
     public List<TicketResponse> getMyTickets() {
         UUID currentUserId = getCurrentUserId();
-        return ticketRepository.findByCreatedById(currentUserId).stream()
+        
+        // Check if current user is IT_SUPPORT
+        boolean isITSupport = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_IT_SUPPORT"));
+        
+        List<Ticket> tickets;
+        
+        if (isITSupport) {
+            // IT Support users: only show tickets assigned to them
+            tickets = ticketRepository.findByAssignedToId(currentUserId);
+        } else {
+            // Employees: only show tickets created by them
+            tickets = ticketRepository.findByCreatedById(currentUserId);
+        }
+        
+        return tickets.stream()
                 .map(this::mapToTicketResponse)
                 .collect(Collectors.toList());
     }
