@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/admin/admin-user.css">
     <link rel="stylesheet" href="/css/component/edit-user.css">
     <link rel="stylesheet" href="/css/component/delete-user.css">
+    <link rel="stylesheet" href="/css/component/user-profile.css">
 </head>
 <body>
     <!-- Header -->
@@ -1020,6 +1021,16 @@
             // Logout
             elements.btnLogout.addEventListener('click', handleLogout);
 
+            // User profile button
+            document.getElementById('btnUserProfile')?.addEventListener('click', () => {
+                if (typeof showUserProfileModal === 'function') {
+                    showUserProfileModal();
+                } else {
+                    const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+                    alert(`User Profile\n\nUsername: ${user.username || 'N/A'}\nFull Name: ${user.fullName || 'N/A'}\nEmail: ${user.email || 'N/A'}`);
+                }
+            });
+
             // Escape key to close modals
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
@@ -1063,5 +1074,8 @@
             loadUsers();
         });
     </script>
+
+    <!-- Insert user profile modal component -->
+    <div th:insert="component/user-profile :: userProfile"></div>
 </body>
 </html>

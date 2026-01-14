@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/admin/admin-sidebar.css">
     <link rel="stylesheet" href="/css/admin/admin-dashboard.css">
+    <link rel="stylesheet" href="/css/component/user-profile.css">
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -517,7 +518,12 @@
 
                 // User profile button
                 document.querySelector('.btn-user')?.addEventListener('click', () => {
-                    window.location.href = '/profile';
+                    if (typeof showUserProfileModal === 'function') {
+                        showUserProfileModal();
+                    } else {
+                        const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+                        alert(`User Profile\n\nUsername: ${user.username || 'N/A'}\nFull Name: ${user.fullName || 'N/A'}\nEmail: ${user.email || 'N/A'}`);
+                    }
                 });
 
                 // Refresh button
@@ -566,5 +572,8 @@
             DashboardController.init();
         });
     </script>
+
+    <!-- Insert user profile modal component -->
+    <div th:insert="component/user-profile :: userProfile"></div>
 </body>
 </html>
