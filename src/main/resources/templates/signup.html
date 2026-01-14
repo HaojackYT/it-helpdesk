@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Helpdesk System - Đăng ký tài khoản">
+    <title>Helpdesk System - Đăng ký</title>
+    <link rel="stylesheet" href="/css/signup.css">
+</head>
+<body>
+    <main class="container">
+        <div class="signup-card">
+            <h1 class="title">Helpdesk System</h1>
+            
+            <!-- Alert Message Container -->
+            <div id="alertContainer" class="alert-container" role="alert" aria-live="polite"></div>
+            
+            <form class="signup-form" id="signupForm" novalidate>
+                <div class="form-group">
+                    <label for="username" class="sr-only">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Username" 
+                        aria-describedby="usernameError"
+                        required
+                        autocomplete="username">
+                    <div id="usernameError" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fullName" class="sr-only">Full Name</label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        name="fullName" 
+                        class="form-input" 
+                        placeholder="Full Name" 
+                        aria-describedby="fullNameError"
+                        required
+                        autocomplete="name">
+                    <div id="fullNameError" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="sr-only">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="Email" 
+                        aria-describedby="emailError"
+                        required
+                        autocomplete="email">
+                    <div id="emailError" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="sr-only">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Password" 
+                        aria-describedby="passwordError"
+                        required
+                        autocomplete="new-password">
+                    <div id="passwordError" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword" class="sr-only">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        class="form-input" 
+                        placeholder="Confirm Password" 
+                        aria-describedby="confirmPasswordError"
+                        required
+                        autocomplete="new-password">
+                    <div id="confirmPasswordError" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="department" class="sr-only">Department</label>
+                    <select 
+                        id="department" 
+                        name="department" 
+                        class="form-input" 
+                        aria-describedby="departmentError"
+                        required>
+                        <option value="" disabled selected>Select Department</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="HR">HR</option>
+                    </select>
+                    <div id="departmentError" class="error-message" role="alert"></div>
+                </div>
+                
+                <button type="submit" class="btn-signup" id="submitBtn">
+                    <span class="btn-text">Sign Up</span>
+                    <span class="btn-loader"></span>
+                </button>
+            </form>
+            
+            <div class="footer-links">
+                <span class="footer-text">Already have an account?</span>
+                <a href="/login" class="link-signin">Sign In</a>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        /**
+         * Signup Module
+         * Handles user registration via REST API
+         */
+        (function() {
+            'use strict';
+
+            // ==========================================
+            // Configuration
+            // ==========================================
+            const CONFIG = {
+                API_BASE_URL: '/api/auth',
+                ENDPOINTS: {
+                    REGISTER: '/register'
+                },
+                REDIRECT_URL: '/login',
+                MIN_USERNAME_LENGTH: 3,
+                MIN_PASSWORD_LENGTH: 6
+            };
+
+            // ==========================================
+            // DOM Elements
+            // ==========================================
+            const elements = {
+                form: document.getElementById('signupForm'),
+                username: document.getElementById('username'),
+                fullName: document.getElementById('fullName'),
+                email: document.getElementById('email'),
+                password: document.getElementById('password'),
+                confirmPassword: document.getElementById('confirmPassword'),
+                department: document.getElementById('department'),
+                submitBtn: document.getElementById('submitBtn'),
+                alertContainer: document.getElementById('alertContainer'),
+                usernameError: document.getElementById('usernameError'),
+                fullNameError: document.getElementById('fullNameError'),
+                emailError: document.getElementById('emailError'),
+                passwordError: document.getElementById('passwordError'),
+                confirmPasswordError: document.getElementById('confirmPasswordError'),
+                departmentError: document.getElementById('departmentError')
+            };
+
+            // ==========================================
+            // Utility Functions
+            // ==========================================
+            
+            function sanitizeInput(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            }
+
+            function showAlert(message, type = 'error') {
+                const alertContainer = elements.alertContainer;
+                const icon = type === 'error' ? '✖' : type === 'success' ? '✓' : 'ℹ';
+                
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type}">
+                        <span class="alert-icon">${icon}</span>
+                        <span class="alert-message">${sanitizeInput(message)}</span>
+                        <button class="alert-close" onclick="this.parentElement.parentElement.classList.remove('show')" aria-label="Close alert">×</button>
+                    </div>
+                `;
+                alertContainer.classList.add('show');
+
+                if (type === 'success') {
+                    setTimeout(() => {
+                        alertContainer.classList.remove('show');
+                    }, 5000);
+                }
+            }
+
+            function hideAlert() {
+                elements.alertContainer.classList.remove('show');
+                elements.alertContainer.innerHTML = '';
+            }
+
+            function showFieldError(field, errorElement, message) {
+                field.classList.add('input-error');
+                field.setAttribute('aria-invalid', 'true');
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+
+            function clearFieldError(field, errorElement) {
+                field.classList.remove('input-error');
+                field.removeAttribute('aria-invalid');
+                errorElement.textContent = '';
+                errorElement.classList.remove('show');
+            }
+
+            function clearAllErrors() {
+                Object.keys(elements).forEach(key => {
+                    if (key.endsWith('Error')) {
+                        const fieldName = key.replace('Error', '');
+                        if (elements[fieldName] && elements[key]) {
+                            clearFieldError(elements[fieldName], elements[key]);
+                        }
+                    }
+                });
+                hideAlert();
+            }
+
+            function setLoading(isLoading) {
+                elements.submitBtn.disabled = isLoading;
+                elements.submitBtn.classList.toggle('loading', isLoading);
+                
+                // Disable all inputs
+                Object.keys(elements).forEach(key => {
+                    if (elements[key] && elements[key].tagName && 
+                        (elements[key].tagName === 'INPUT' || elements[key].tagName === 'SELECT')) {
+                        elements[key].disabled = isLoading;
+                    }
+                });
+            }
+
+            // ==========================================
+            // Validation
+            // ==========================================
+            
+            function validateForm() {
+                let isValid = true;
+                clearAllErrors();
+
+                // Validate username
+                const username = elements.username.value.trim();
+                if (!username) {
+                    showFieldError(elements.username, elements.usernameError, 'Username is required');
+                    isValid = false;
+                } else if (username.length < CONFIG.MIN_USERNAME_LENGTH) {
+                    showFieldError(elements.username, elements.usernameError, 
+                        `Username must be at least ${CONFIG.MIN_USERNAME_LENGTH} characters`);
+                    isValid = false;
+                }
+
+                // Validate full name
+                const fullName = elements.fullName.value.trim();
+                if (!fullName) {
+                    showFieldError(elements.fullName, elements.fullNameError, 'Full name is required');
+                    isValid = false;
+                }
+
+                // Validate email
+                const email = elements.email.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email) {
+                    showFieldError(elements.email, elements.emailError, 'Email is required');
+                    isValid = false;
+                } else if (!emailRegex.test(email)) {
+                    showFieldError(elements.email, elements.emailError, 'Please enter a valid email address');
+                    isValid = false;
+                }
+
+                // Validate password
+                const password = elements.password.value;
+                if (!password) {
+                    showFieldError(elements.password, elements.passwordError, 'Password is required');
+                    isValid = false;
+                } else if (password.length < CONFIG.MIN_PASSWORD_LENGTH) {
+                    showFieldError(elements.password, elements.passwordError, 
+                        `Password must be at least ${CONFIG.MIN_PASSWORD_LENGTH} characters`);
+                    isValid = false;
+                }
+
+                // Validate confirm password
+                const confirmPassword = elements.confirmPassword.value;
+                if (!confirmPassword) {
+                    showFieldError(elements.confirmPassword, elements.confirmPasswordError, 'Please confirm your password');
+                    isValid = false;
+                } else if (password !== confirmPassword) {
+                    showFieldError(elements.confirmPassword, elements.confirmPasswordError, 'Passwords do not match');
+                    isValid = false;
+                }
+
+                // Validate department
+                const department = elements.department.value;
+                if (!department) {
+                    showFieldError(elements.department, elements.departmentError, 'Please select a department');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            // ==========================================
+            // API Functions
+            // ==========================================
+            
+            async function registerAPI(userData) {
+                try {
+                    const response = await fetch(
+                        `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.REGISTER}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(userData)
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Registration failed');
+                    }
+
+                    return data;
+                } catch (error) {
+                    if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                        throw new Error('Unable to connect to server. Please check your connection.');
+                    }
+                    throw error;
+                }
+            }
+
+            // ==========================================
+            // Event Handlers
+            // ==========================================
+            
+            async function handleSubmit(event) {
+                event.preventDefault();
+
+                if (!validateForm()) {
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    const userData = {
+                        username: elements.username.value.trim(),
+                        fullName: elements.fullName.value.trim(),
+                        email: elements.email.value.trim(),
+                        password: elements.password.value,
+                        confirmPassword: elements.confirmPassword.value,
+                        department: elements.department.value
+                    };
+
+                    const response = await registerAPI(userData);
+
+                    showAlert('Registration successful! Redirecting to login...', 'success');
+
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = CONFIG.REDIRECT_URL;
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    showAlert(error.message || 'Registration failed. Please try again.', 'error');
+                    setLoading(false);
+                }
+            }
+
+            function handleInputChange(field, errorElement) {
+                return function() {
+                    if (field.value.trim()) {
+                        clearFieldError(field, errorElement);
+                    }
+                };
+            }
+
+            // ==========================================
+            // Initialization
+            // ==========================================
+            
+            function init() {
+                if (!elements.form) {
+                    console.error('Signup form not found');
+                    return;
+                }
+
+                // Add form submit listener
+                elements.form.addEventListener('submit', handleSubmit);
+
+                // Add input change listeners for real-time validation feedback
+                elements.username.addEventListener('input', handleInputChange(elements.username, elements.usernameError));
+                elements.fullName.addEventListener('input', handleInputChange(elements.fullName, elements.fullNameError));
+                elements.email.addEventListener('input', handleInputChange(elements.email, elements.emailError));
+                elements.password.addEventListener('input', handleInputChange(elements.password, elements.passwordError));
+                elements.confirmPassword.addEventListener('input', handleInputChange(elements.confirmPassword, elements.confirmPasswordError));
+                elements.department.addEventListener('change', handleInputChange(elements.department, elements.departmentError));
+
+                // Add blur validation
+                elements.username.addEventListener('blur', () => {
+                    if (elements.username.value.trim() && elements.username.value.trim().length < CONFIG.MIN_USERNAME_LENGTH) {
+                        showFieldError(elements.username, elements.usernameError, 
+                            `Username must be at least ${CONFIG.MIN_USERNAME_LENGTH} characters`);
+                    }
+                });
+
+                elements.email.addEventListener('blur', () => {
+                    const email = elements.email.value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (email && !emailRegex.test(email)) {
+                        showFieldError(elements.email, elements.emailError, 'Please enter a valid email address');
+                    }
+                });
+
+                elements.password.addEventListener('blur', () => {
+                    if (elements.password.value && elements.password.value.length < CONFIG.MIN_PASSWORD_LENGTH) {
+                        showFieldError(elements.password, elements.passwordError, 
+                            `Password must be at least ${CONFIG.MIN_PASSWORD_LENGTH} characters`);
+                    }
+                });
+
+                elements.confirmPassword.addEventListener('blur', () => {
+                    if (elements.confirmPassword.value && elements.password.value !== elements.confirmPassword.value) {
+                        showFieldError(elements.confirmPassword, elements.confirmPasswordError, 'Passwords do not match');
+                    }
+                });
+
+                console.log('Signup form initialized');
+            }
+
+            // Run initialization when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
