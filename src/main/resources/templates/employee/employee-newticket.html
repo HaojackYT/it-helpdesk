@@ -351,16 +351,6 @@
                 }
             },
 
-            updateUserGreeting() {
-                const userInfo = AuthManager.getUserInfo();
-                const greetingElement = document.getElementById('userGreeting');
-                
-                if (userInfo && greetingElement) {
-                    const displayName = userInfo.fullName || userInfo.username;
-                    greetingElement.textContent = `Welcome, ${displayName}`;
-                }
-            },
-
             prefillUserInfo() {
                 const userInfo = AuthManager.getUserInfo();
                 
@@ -535,7 +525,6 @@
             }
 
             // Update UI with user info
-            UIManager.updateUserGreeting();
             UIManager.prefillUserInfo();
 
             // Add form submit listener

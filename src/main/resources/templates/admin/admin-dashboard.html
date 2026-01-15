@@ -21,7 +21,6 @@
         <div class="header-content">
             <h1 class="header-title">IT Helpdesk</h1>
             <div class="header-actions">
-                <span id="userGreeting" class="user-greeting"></span>
                 <button class="btn-icon btn-user" aria-label="User profile" title="User Profile">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -348,16 +347,6 @@
         // UI Manager
         // ========================================
         const UIManager = {
-            updateUserGreeting() {
-                const userInfo = AuthManager.getUserInfo();
-                const greetingElement = document.getElementById('userGreeting');
-                
-                if (userInfo && greetingElement) {
-                    const displayName = userInfo.fullName || userInfo.username;
-                    greetingElement.textContent = `Welcome, ${displayName}`;
-                }
-            },
-
             updateStatValue(elementId, value, animate = true) {
                 const element = document.getElementById(elementId);
                 if (!element) return;
@@ -492,7 +481,6 @@
 
                 // Setup UI
                 this.setupEventListeners();
-                UIManager.updateUserGreeting();
                 
                 // Load dashboard data
                 await this.loadDashboardData();

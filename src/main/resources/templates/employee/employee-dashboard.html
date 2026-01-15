@@ -15,7 +15,6 @@
         <div class="header-content">
             <h1 class="header-title">IT Helpdesk</h1>
             <div class="header-actions">
-                <span class="user-greeting" id="userGreeting">Welcome, Employee</span>
                 <button class="btn-icon btn-user" aria-label="User profile">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -358,17 +357,6 @@
         // UI Update Functions
         // ========================================
         const UIManager = {
-            // Update user greeting in header
-            updateUserGreeting() {
-                const userInfo = AuthManager.getUserInfo();
-                const greetingElement = document.getElementById('userGreeting');
-                
-                if (userInfo && greetingElement) {
-                    const displayName = userInfo.fullName || userInfo.username;
-                    greetingElement.textContent = `Welcome, ${displayName}`;
-                }
-            },
-
             // Update statistics values with animation
             updateStatValue(elementId, value) {
                 const element = document.getElementById(elementId);
@@ -544,9 +532,6 @@
                 window.location.href = '/login';
                 return;
             }
-
-            // Update user greeting
-            UIManager.updateUserGreeting();
 
             // Load dashboard data
             loadDashboardData();

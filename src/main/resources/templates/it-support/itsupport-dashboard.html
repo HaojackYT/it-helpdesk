@@ -18,8 +18,6 @@
         <div class="header-content">
             <h1 class="header-title">IT Helpdesk</h1>
             <div class="header-actions">
-                <span id="userGreeting" class="user-greeting" th:text="'Welcome, ' + ${currentUserFullName}">Welcome, User</span>
-                
                 <button class="btn-icon btn-user" aria-label="User profile">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -156,7 +154,6 @@
 
             const elements = {
                 loadingOverlay: document.getElementById('loadingOverlay'),
-                userGreeting: document.getElementById('userGreeting'),
                 totalTickets: document.getElementById('totalTickets'),
                 totalOpen: document.getElementById('totalOpen'),
                 totalSolved: document.getElementById('totalSolved'),
@@ -327,20 +324,6 @@
                 });
             }
 
-            // Update header greeting from localStorage (fallback when page is client-side navigated)
-            function updateUserGreetingFromLocal() {
-                try {
-                    const raw = localStorage.getItem('user_info') || localStorage.getItem('USER') || '{}';
-                    const user = JSON.parse(raw);
-                    const name = user && (user.fullName || user.fullname || user.username);
-                    if (name && elements.userGreeting) {
-                        elements.userGreeting.textContent = `Welcome, ${name}`;
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            }
-
             function init() {
                 if (elements.toggleBtn) {
                     elements.toggleBtn.addEventListener('click', () => {
@@ -356,8 +339,6 @@
                 }
 
                 initHeaderButtons();
-                // ensure greeting is populated from local storage if available
-                updateUserGreetingFromLocal();
                 loadDashboardData();
             }
 
