@@ -292,31 +292,31 @@
     </div>
 
     <script>
-        // Authentication Module
+        // Authentication Module (using sessionStorage for tab isolation)
         const Auth = {
             TOKEN_KEY: 'auth_token',
             USER_KEY: 'user_info',
             
             getToken() {
-                return localStorage.getItem(this.TOKEN_KEY);
+                return sessionStorage.getItem(this.TOKEN_KEY);
             },
             
             setToken(token) {
-                localStorage.setItem(this.TOKEN_KEY, token);
+                sessionStorage.setItem(this.TOKEN_KEY, token);
             },
             
             removeToken() {
-                localStorage.removeItem(this.TOKEN_KEY);
-                localStorage.removeItem(this.USER_KEY);
+                sessionStorage.removeItem(this.TOKEN_KEY);
+                sessionStorage.removeItem(this.USER_KEY);
             },
             
             getUserInfo() {
-                const userJson = localStorage.getItem(this.USER_KEY);
+                const userJson = sessionStorage.getItem(this.USER_KEY);
                 return userJson ? JSON.parse(userJson) : null;
             },
             
             setUserInfo(userInfo) {
-                localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
+                sessionStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
             },
             
             isAuthenticated() {

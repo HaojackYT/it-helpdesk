@@ -263,19 +263,19 @@
     </div>
 
     <script>
-        // Reuse TicketsManager and AuthManager from admin page (identical logic)
+        // Reuse TicketsManager and AuthManager from admin page (using sessionStorage for tab isolation)
         const AuthManager = {
             STORAGE_KEYS: {
                 TOKEN: 'auth_token',
                 TOKEN_TYPE: 'token_type',
                 USER: 'user_info'
             },
-            getToken() { return localStorage.getItem(this.STORAGE_KEYS.TOKEN); },
-            getTokenType() { return localStorage.getItem(this.STORAGE_KEYS.TOKEN_TYPE) || 'Bearer'; },
+            getToken() { return sessionStorage.getItem(this.STORAGE_KEYS.TOKEN); },
+            getTokenType() { return sessionStorage.getItem(this.STORAGE_KEYS.TOKEN_TYPE) || 'Bearer'; },
             getAuthHeader() { const token = this.getToken(); const tokenType = this.getTokenType(); return token ? `${tokenType} ${token}` : null; },
-            getUserInfo() { const userStr = localStorage.getItem(this.STORAGE_KEYS.USER); try { return userStr ? JSON.parse(userStr) : null; } catch { return null; } },
+            getUserInfo() { const userStr = sessionStorage.getItem(this.STORAGE_KEYS.USER); try { return userStr ? JSON.parse(userStr) : null; } catch { return null; } },
             isAuthenticated() { const token = this.getToken(); if (!token) return false; try { const parts = token.split('.'); if (parts.length !== 3) { this.logout(); return false; } const payload = JSON.parse(atob(parts[1])); const expiration = payload.exp * 1000; if (Date.now() >= expiration) { this.logout(); return false; } return true; } catch { this.logout(); return false; } },
-            logout() { localStorage.removeItem(this.STORAGE_KEYS.TOKEN); localStorage.removeItem(this.STORAGE_KEYS.TOKEN_TYPE); localStorage.removeItem(this.STORAGE_KEYS.USER); window.location.href = '/login'; },
+            logout() { sessionStorage.removeItem(this.STORAGE_KEYS.TOKEN); sessionStorage.removeItem(this.STORAGE_KEYS.TOKEN_TYPE); sessionStorage.removeItem(this.STORAGE_KEYS.USER); window.location.href = '/login'; },
             requireAuth() { if (!this.isAuthenticated()) { window.location.href = '/login'; return false;} return true; }
         };
 

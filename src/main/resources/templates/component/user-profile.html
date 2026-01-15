@@ -33,7 +33,7 @@
                 const modal = document.getElementById('userProfileModal');
                 if (!modal) return;
 
-                        const raw = user || JSON.parse(localStorage.getItem('user_info') || localStorage.getItem('USER') || '{}');
+                        const raw = user || JSON.parse(sessionStorage.getItem('user_info') || sessionStorage.getItem('USER') || '{}');
 
                         // helper to format roles: remove ROLE_ prefix and replace underscores with spaces
                         function formatRoleString(role) {
@@ -89,8 +89,8 @@
                 editBtn.addEventListener('click', async () => {
                     console.log('Edit button clicked!');
                     try {
-                        const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
-                        const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
+                        const token = sessionStorage.getItem('auth_token') || sessionStorage.getItem('TOKEN');
+                        const tokenType = sessionStorage.getItem('token_type') || sessionStorage.getItem('TOKEN_TYPE') || 'Bearer';
                         const headers = { 'Accept': 'application/json' };
                         if (token) headers['Authorization'] = `${tokenType} ${token}`;
 
@@ -232,8 +232,8 @@
                         return;
                     }
 
-                    const token = localStorage.getItem('auth_token') || localStorage.getItem('TOKEN');
-                    const tokenType = localStorage.getItem('token_type') || localStorage.getItem('TOKEN_TYPE') || 'Bearer';
+                    const token = sessionStorage.getItem('auth_token') || sessionStorage.getItem('TOKEN');
+                    const tokenType = sessionStorage.getItem('token_type') || sessionStorage.getItem('TOKEN_TYPE') || 'Bearer';
                     const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
                     if (token) headers['Authorization'] = `${tokenType} ${token}`;
 

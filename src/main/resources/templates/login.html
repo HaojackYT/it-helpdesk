@@ -278,18 +278,19 @@
             }
 
             // ==========================================
-            // Storage Functions
+            // Storage Functions (using sessionStorage for tab isolation)
             // ==========================================
             
             /**
-             * Save authentication data to localStorage
+             * Save authentication data to sessionStorage
+             * Using sessionStorage allows different users in different tabs
              */
             function saveAuthData(loginResponse) {
                 const { token, type, username, fullName, email, roles, permissions, department } = loginResponse;
                 
-                // Save token
-                localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
-                localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE, type || 'Bearer');
+                // Save token to sessionStorage (tab-specific)
+                sessionStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
+                sessionStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE, type || 'Bearer');
                 
                 // Save user info
                 const userInfo = {
@@ -300,16 +301,16 @@
                     roles: Array.from(roles || []),
                     permissions: Array.from(permissions || [])
                 };
-                localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(userInfo));
+                sessionStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(userInfo));
             }
 
             /**
              * Clear authentication data
              */
             function clearAuthData() {
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE);
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
+                sessionStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
+                sessionStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE);
+                sessionStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
             }
 
             /**
@@ -332,7 +333,7 @@
              * Check if user is already logged in with valid token
              */
             function isAuthenticated() {
-                const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+                const token = sessionStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
                 if (!token) {
                     return false;
                 }
@@ -370,6 +371,10 @@
              */
             window.forceLogout = function() {
                 clearAuthData();
+                // Also clear any old localStorage data
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN_TYPE);
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
                 console.log('Logged out successfully. Refreshing page...');
                 window.location.reload();
             };
@@ -450,9 +455,9 @@
              * Initialize login module
              */
             function init() {
-                // Check if already authenticated
+                // Check if already authenticated in this tab
                 if (isAuthenticated()) {
-                    const userInfo = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER) || '{}');
+                    const userInfo = JSON.parse(sessionStorage.getItem(CONFIG.STORAGE_KEYS.USER) || '{}');
                     const redirectUrl = getRedirectUrl(userInfo.roles);
                     window.location.href = redirectUrl;
                     return;

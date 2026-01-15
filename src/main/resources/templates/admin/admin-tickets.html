@@ -379,7 +379,7 @@
 
     <script>
         /**
-         * Authentication Module - Handles JWT token management
+         * Authentication Module - Handles JWT token management (using sessionStorage for tab isolation)
          */
         const AuthManager = {
             STORAGE_KEYS: {
@@ -389,11 +389,11 @@
             },
 
             getToken() {
-                return localStorage.getItem(this.STORAGE_KEYS.TOKEN);
+                return sessionStorage.getItem(this.STORAGE_KEYS.TOKEN);
             },
 
             getTokenType() {
-                return localStorage.getItem(this.STORAGE_KEYS.TOKEN_TYPE) || 'Bearer';
+                return sessionStorage.getItem(this.STORAGE_KEYS.TOKEN_TYPE) || 'Bearer';
             },
 
             getAuthHeader() {
@@ -403,7 +403,7 @@
             },
 
             getUserInfo() {
-                const userStr = localStorage.getItem(this.STORAGE_KEYS.USER);
+                const userStr = sessionStorage.getItem(this.STORAGE_KEYS.USER);
                 try {
                     return userStr ? JSON.parse(userStr) : null;
                 } catch {
@@ -438,9 +438,9 @@
             },
 
             logout() {
-                localStorage.removeItem(this.STORAGE_KEYS.TOKEN);
-                localStorage.removeItem(this.STORAGE_KEYS.TOKEN_TYPE);
-                localStorage.removeItem(this.STORAGE_KEYS.USER);
+                sessionStorage.removeItem(this.STORAGE_KEYS.TOKEN);
+                sessionStorage.removeItem(this.STORAGE_KEYS.TOKEN_TYPE);
+                sessionStorage.removeItem(this.STORAGE_KEYS.USER);
                 window.location.href = '/login';
             },
 

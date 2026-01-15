@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/it-support/itsupport-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/it-support/itsupport-dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/component/user-profile.css}">
+</head>
 <body>
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -172,9 +173,9 @@
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 };
-                const token = localStorage.getItem('auth_token');
+                const token = sessionStorage.getItem('auth_token');
                 if (token) {
-                    headers['Authorization'] = `${localStorage.getItem('token_type') || 'Bearer'} ${token}`;
+                    headers['Authorization'] = `${sessionStorage.getItem('token_type') || 'Bearer'} ${token}`;
                 }
                 return headers;
             }
@@ -299,9 +300,9 @@
             }
 
             function logout() {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('token_type');
-                localStorage.removeItem('user_info');
+                sessionStorage.removeItem('auth_token');
+                sessionStorage.removeItem('token_type');
+                sessionStorage.removeItem('user_info');
                 window.location.href = '/login';
             }
 
@@ -313,7 +314,7 @@
                         return;
                     }
 
-                    const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+                    const user = JSON.parse(sessionStorage.getItem('user_info') || '{}');
                     alert(`User Profile\n\nUsername: ${user.username || 'N/A'}\nFull Name: ${user.fullName || 'N/A'}\nEmail: ${user.email || 'N/A'}`);
                 });
 

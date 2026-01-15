@@ -229,15 +229,15 @@
         const USER_INFO_KEY = 'user_info';
 
         // ========================================
-        // Authentication Manager
+        // Authentication Manager (using sessionStorage for tab isolation)
         // ========================================
         const AuthManager = {
             getToken() {
-                return localStorage.getItem(TOKEN_KEY);
+                return sessionStorage.getItem(TOKEN_KEY);
             },
 
             getUserInfo() {
-                const userInfo = localStorage.getItem(USER_INFO_KEY);
+                const userInfo = sessionStorage.getItem(USER_INFO_KEY);
                 return userInfo ? JSON.parse(userInfo) : null;
             },
 
@@ -251,8 +251,8 @@
             },
 
             logout() {
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(USER_INFO_KEY);
+                sessionStorage.removeItem(TOKEN_KEY);
+                sessionStorage.removeItem(USER_INFO_KEY);
                 window.location.href = '/login';
             },
 

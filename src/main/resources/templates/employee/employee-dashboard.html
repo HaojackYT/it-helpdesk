@@ -156,28 +156,28 @@
         const USER_INFO_KEY = 'user_info';
 
         // ========================================
-        // Authentication & Authorization Helper
+        // Authentication & Authorization Helper (using sessionStorage for tab isolation)
         // ========================================
         const AuthManager = {
-            // Get JWT token from localStorage
+            // Get JWT token from sessionStorage
             getToken() {
-                return localStorage.getItem(TOKEN_KEY);
+                return sessionStorage.getItem(TOKEN_KEY);
             },
 
-            // Save token to localStorage
+            // Save token to sessionStorage
             setToken(token) {
-                localStorage.setItem(TOKEN_KEY, token);
+                sessionStorage.setItem(TOKEN_KEY, token);
             },
 
-            // Get user info from localStorage
+            // Get user info from sessionStorage
             getUserInfo() {
-                const userInfo = localStorage.getItem(USER_INFO_KEY);
+                const userInfo = sessionStorage.getItem(USER_INFO_KEY);
                 return userInfo ? JSON.parse(userInfo) : null;
             },
 
-            // Save user info to localStorage
+            // Save user info to sessionStorage
             setUserInfo(userInfo) {
-                localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
+                sessionStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
             },
 
             // Check if user is authenticated
@@ -198,8 +198,8 @@
 
             // Logout - clear all auth data
             logout() {
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(USER_INFO_KEY);
+                sessionStorage.removeItem(TOKEN_KEY);
+                sessionStorage.removeItem(USER_INFO_KEY);
                 window.location.href = '/login';
             },
 
